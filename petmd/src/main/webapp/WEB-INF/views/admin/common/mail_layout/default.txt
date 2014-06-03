@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<title>MediLatte</title>
+<script type='text/javascript' src='http://m.medilatte.com/client/js/ajax.js'></script>
+<script>
+function mailling(){
+
+	var url = "http://m.medilatte.com/client/emailNotUse.latte";
+
+	var param = "?uid=" + document.getElementById("uid").value
+
+	var result = getAjax(url+param);
+	
+	if(result == "OK"){
+	alert("메일 수신 거부를 완료 하였습니다\nComplete the bouncing");
+	}
+}
+</script>
+</head>
+
+<body style="padding:0px; margin:0px;">
+	
+    <div style="margin:20px 20px; width:645px;">
+        <table cellpadding="0" border="0" cellspacing="0" style="width:645px;">
+            <tr>
+                <td style="font-size:0; line-height:0; margin:0;"><a href="http://www.beautylatte.co.kr" target="_blank"><img src="http://img.beautylatte.co.kr/common/template/images/mail/head.gif" alt="" style="border:0;" /></a></td>
+            </tr>
+            <tr>
+                <td style="font-size:12px; color:#777777; line-height:19px; margin:0; padding:30px; width:566px; vertical-align:middle; font-family:Dotum,Arial,sans-serif; ">
+                
+                <!-- contents start -->
+                	
+                    ${content}
+                    
+                	<p style="display:block; margin-top:30px; text-align:center;"><a href="http://www.beautylatte.co.kr" target="_blank" style="border:0;" ><img src="http://img.beautylatte.co.kr/common/template/images/mail/btn_h_go.gif" alt="" style="border:0;" /></a></p>
+                    
+                    
+                <!-- /contents end-->
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size:0; line-height:0; margin:0; padding:0;">
+                <img src="http://img.beautylatte.co.kr/common/template/images/mail/bottom.gif" alt="" usemap="#no_turn" style="border:0;" />
+                    <map id="no_turn" name="no_turn">
+                        <area shape="rect" coords="187,38,232,50" href="http://m.medilatte.com/client/emailNotUse.latte?uid=${uid_kor}"  alt="" style="border:0;" />
+                        <area shape="rect" coords="297,54,355,66" href="http://m.medilatte.com/client/emailNotUse.latte?uid=${uid_eng}"  alt="" style="border:0;" />
+                    </map>
+                </td>
+            </tr>
+        </table>
+	</div>
+</body>
+</html>

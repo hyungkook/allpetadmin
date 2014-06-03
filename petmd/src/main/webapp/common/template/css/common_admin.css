@@ -1,0 +1,102 @@
+/* css reset */
+
+html, body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, p, blockquote, th, td { margin:0; padding:0; text-shadow:none;}
+table { border-collapse:collapse; table-layout:fixed; border-spacing:0; width:100%; }
+fieldset, img, abbr, acronym { border:0; margin:0; padding:0;}
+address, caption, cite, code, dfn, em, strong, th, var { font-style:normal; font-weight:normal; }
+ol, ul, li { list-style:none; padding:0; margin:0; text-shadow:none;}
+img { border:0; margin:0; padding:0; line-height:0px; font-size:0px; text-shadow:none;}
+caption, th { text-align:left; }
+h1, h2, h3, h4, h5, h6 { font-size:100%; font-weight:normal; line-height:100%;}
+q:before, q:after { content:''; }
+a { text-decoration:none; text-shadow:none;  border:0; margin:0; padding:0; }
+
+input[placeholder], [placeholder], *[placeholder]
+{
+    color:#bbbbbb; !important;
+}
+
+/*  폰트 불러오기  
+@font-face {font-family:'Helvetica57';src:url(/font/HelveticaNeue-LightCond.otf);}
+@font-face {font-family:'Helvetica37';src:url(/font/HelveticaNeue-LightCondObl.otf);}
+*/
+
+
+
+/* ---- 기본 셋팅 ---- */
+
+html{width:100%; height:100%; margin:0; padding:0;}
+body {width:100%; height:100%; background:#f0f0f0;  font-family:"돋움",Dotum,Arial,Verdana,Geneva,sans-serif; position:relative; margin:0; padding:0;}
+
+.ui-body-c {background:#606060;}
+.ui-overlay-c, .ui-content{background:#f0f0f0;}
+
+/* 레이아웃  */
+#head{width:100%; height:50px; margin:0; padding:0; background:#f16d59; border:none;}
+#head h1{color:#036; font-size:18px; line-height:21px; font-weight:bold; color:#FFF; margin-top:15px; font-family:"돋움",Dotum,Arial, Helvetica, sans-serif;}
+#head h1.img{ font-size:0; line-height:0; padding:0;}
+#contents{ padding:0; margin:0; position:relative; height:100%; width:100%; z-index:0;}
+#footer{padding:15px 10px;}
+
+
+/* ----------------- 기본 ----------------- */
+.ui-header .ui-btn-inner, .ui-footer .ui-btn-inner, .ui-mini .ui-btn-inner{ text-shadow:none; font-size:0; line-height:0; padding:0; margin:0;}
+.ui-bar-a .ui-shadow, .ui-bar-b .ui-shadow, .ui-bar-c .ui-shadow{ text-shadow:none; font-size:0; line-height:0; padding:0; margin:0; box-shadow:none;}
+.ui-btn-corner-all{ text-shadow:none; border:none; border-radius:0;}
+.ui-btn-inner { font-size:12px; margin:0; padding:0;}
+.ui-header .ui-btn-left{ top:0; left:0;}
+input.ui-input-text, textarea.ui-input-text{ margin:0; padding:0;}
+
+
+/* ----------------- 체크박스 및 라디오 버튼 위치값변경 ----------------- */
+.ui-checkbox .ui-btn-icon-left .ui-icon, .ui-radio .ui-btn-icon-left .ui-icon{left:4px;}
+.ui-checkbox .ui-btn-icon-left .ui-btn-inner, .ui-radio .ui-btn-icon-left .ui-btn-inner{ padding-left:30px; padding-top:4px; padding-bottom:2px;}
+.ui-checkbox input, .ui-radio input{left:4px; top:50%; margin-top:-10px;}
+
+
+#head .ui-btn-up-a { background:#d34f3b;}
+#head .ui-btn-hover-a { background:#b7412f;}
+#head .ui-btn-down-a { background:#b7412f;}
+#head .ui-btn-active { background:#b7412f;}
+
+#footer .txt01{ font-size:11px; line-height:16px; font-weight:normal; font-weight:bold; color:#ffffff;}
+#footer .txt01 label{ font-weight:normal;}
+#footer .txt02{ font-size:10px; line-height:15px; font-weight:bold; color:#ffffff;}
+#footer .txt03{ font-size:10px; line-height:15px; font-weight:normal; color:#c4c4c4;}
+#footer .border_r{ padding-right:8px; margin-right:4px; display:inline-block; background:url(../images/common/border02.png) right 4px no-repeat;}
+
+.btn_select{ border:solid 1px #dedede; background:#ffffff; border-radius:5px; position:relative;}
+.btn_select .ui-btn-inner   { font-size:15px; line-height:34px; height:34px;}
+.btn_select .ui-btn-up-c    { margin:0; padding:0; background:none; box-shadow:none; -webkit-box-shadow:none;}
+.btn_select .ui-btn-hover-c { margin:0; padding:0; background:none; box-shadow:none; -webkit-box-shadow:none;}
+.btn_select .ui-btn-down-c  { margin:0; padding:0; background:none; box-shadow:none; -webkit-box-shadow:none;}
+.btn_select .ui-btn-active  { margin:0; padding:0; background:none; box-shadow:none; -webkit-box-shadow:none;}
+.btn_select .bu{ position:absolute; top:0; right:8px; width:26px; height:34px; font-size:0; line-height:0; border-left:solid 1px #dedede;}
+
+
+
+
+
+
+
+/* id, class selector */
+.none { display:none; }
+.nobg { background:none; }
+.fleft { float:left; }
+.fright { float:right; }
+.left { text-align:left; }
+.right { text-align:right; }
+.center { text-align:center; }
+.bold { font-weight:bold; }
+
+.mt04   { margin-top:4px; }
+.mt05   { margin-top:5px; }
+.mt08   { margin-top:8px; }
+.mt10   { margin-top:10px; }
+.mt15   { margin-top:15px; }
+.mt20   { margin-top:20px; }
+.mt25   { margin-top:25px; }
+.mt30   { margin-top:30px; }
+
+
+

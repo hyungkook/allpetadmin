@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+
+<mapper namespace="COMMON">
+
+	<select id="getElementList" parameterType="string" resultType="hashmap">
+		SELECT
+			s_group,
+			s_key,
+			s_value,
+			s_comment,
+			n_index
+		FROM
+			DB_ALLPET.T_ELEMENT
+		WHERE
+			S_GROUP = #{value}
+	</select>
+	
+	<select id="getElement" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_group,
+			s_key,
+			s_value,
+			s_comment,
+			n_index
+		FROM
+			DB_ALLPET.T_ELEMENT
+		WHERE
+			S_GROUP = #{group}
+			AND S_KEY = #{key}
+	</select>
+	
+	
+	
+	<!--  -->
+	<!--  -->
+	<!--  -->
+	
+	
+	
+	<select id="getSidoList" resultType="hashmap">
+		SELECT 	
+			s_sido
+		FROM 
+			DB_ALLPET.T_LOCATION_INFO 
+		GROUP BY S_SIDO	
+	</select>
+	
+	<select id="getSigunguList" resultType="hashmap" parameterType="string">
+		SELECT 	
+			s_gugun
+		FROM 
+			DB_ALLPET.T_LOCATION_INFO
+		WHERE
+			S_SIDO = #{value}
+		GROUP BY S_GUGUN	
+	</select>
+	
+	<select id="getDongList" resultType="hashmap" parameterType="hashmap">
+		SELECT 	
+			s_dong
+		FROM 
+			DB_ALLPET.T_LOCATION_INFO
+		WHERE
+			S_SIDO = #{sido}
+			AND S_GUGUN = #{sigungu}
+	</select>
+	
+	<!-- 우편번호 리스트 -->
+	<select id="selectZipCodeList" parameterType="string" resultType="hashmap">
+		SELECT
+			s_zipcode,
+			s_sido, 
+			s_gugun, 
+			s_dong, 
+			s_ri, 
+			s_bldg, 
+			s_bunji
+		FROM
+			DB_ALLPET.T_ZIPCODE
+		WHERE
+			S_DONG LIKE ('${value}%')
+			OR S_RI LIKE ('${value}%')
+			OR S_BLDG LIKE ('${value}%')
+	</select>
+	
+	<select id="getZipcode" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_zipcode,
+			s_sido, 
+			s_gugun, 
+			s_dong, 
+			s_ri, 
+			s_bldg, 
+			s_bunji
+		FROM DB_ALLPET.T_ZIPCODE
+		WHERE
+			S_SIDO LIKE '%${search_text}%'
+			OR S_GUGUN LIKE '%${search_text}%'
+			OR S_DONG LIKE '%${search_text}%'
+			OR S_RI LIKE '%${search_text}%'
+			OR S_BLDG LIKE '%${search_text}%'
+	</select>
+	
+	
+	
+	<!--  -->
+	<!--  -->
+	<!--  -->
+	
+	
+	
+	<!-- 커스터마이징 -->
+	
+	<delete id="removeCustomItems" parameterType="string">
+		UPDATE
+			DB_ALLPET.T_CUSTOMIZE
+		SET
+			S_STATUS = 'N'
+		WHERE
+			S_CMID IN ${value}
+	</delete>
+	
+	<update id="removeCustomItem" parameterType="string">
+		UPDATE
+			DB_ALLPET.T_CUSTOMIZE
+		SET
+			S_STATUS = 'N'
+		WHERE
+			S_CMID = #{value}
+	</update>
+	
+	<update id="updateCustomizeItem" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_CUSTOMIZE
+		SET
+			N_INDEX = ${index},
+			<if test='status != null and !status.equals("")'>
+			S_STATUS = #{status},
+			</if>
+			<if test='visible != null and !visible.equals("")'>
+			S_VISIBLE = #{visible},
+			</if>
+			<if test='group != null and !group.equals("")'>
+			S_GROUP = #{group},
+			</if>
+			S_VALUE = #{value},
+			S_NAME = #{name}
+		WHERE
+			S_CMID = #{cmid}
+	</update>
+	
+	<insert id="insertCustomizeItem" parameterType="hashmap">
+		INSERT INTO
+			DB_ALLPET.T_CUSTOMIZE
+			(
+				S_CMID,
+				S_ID,
+				S_PARENT,
+				N_INDEX,
+				S_STATUS,
+				S_GROUP,
+				S_VALUE,
+				S_ETC,
+				N_LV,
+				S_NAME,
+				S_VISIBLE
+			)
+		VALUES
+			(
+				#{cmid},
+				#{idx},
+				#{parent},
+				${index},
+				#{status},
+				#{group},
+				#{value},
+				NULL,
+				${lv},
+				#{name},
+				#{visible}
+			)
+	</insert>
+	
+	<select id="getChildCustom" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_cmid,
+			s_parent,
+			n_index,
+			s_status,
+			s_group,
+			s_value,
+			((
+				SELECT
+					COUNT(*)
+				FROM
+					DB_ALLPET.T_CUSTOMIZE
+				WHERE
+					N_INDEX <![CDATA[<]]> A.N_INDEX
+					AND S_ID = #{id}
+					AND S_PARENT = #{parent}
+					AND S_STATUS = 'Y'
+			)+1) AS sequence
+		FROM
+			DB_ALLPET.T_CUSTOMIZE A
+		WHERE
+			S_ID = #{id}
+			AND S_PARENT = #{parent}
+			AND S_STATUS = 'Y'
+		ORDER BY
+			N_INDEX ASC
+	</select>
+	
+	<select id="getCustomItem" parameterType="string" resultType="hashmap">
+		SELECT
+			s_cmid,
+			s_parent,
+			n_index,
+			s_value,
+			s_group,
+			((
+				SELECT
+					COUNT(*)
+				FROM
+					DB_ALLPET.T_CUSTOMIZE
+				WHERE
+					N_INDEX <![CDATA[<]]> A.N_INDEX
+					AND S_PARENT = A.S_PARENT
+					AND S_STATUS = 'Y'
+			)+1) AS sequence,
+			s_name,
+			s_status
+		FROM
+			DB_ALLPET.T_CUSTOMIZE A
+		WHERE
+			S_CMID = #{value}
+		ORDER BY N_INDEX
+	</select>
+	
+	<select id="getCustomLastIndex" parameterType="string" resultType="string">
+		SELECT
+			MAX(N_INDEX) AS last_index
+		FROM
+			DB_ALLPET.T_CUSTOMIZE A
+		WHERE
+			S_ID = #{id}
+			AND S_PARENT = #{parent}
+	</select>
+	
+	<select id="getByParent" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			A.s_cmid,
+			A.s_parent,
+			A.s_status,
+			A.s_group,
+			A.s_value,
+			A.s_name,
+			A.s_visible
+		FROM
+			DB_ALLPET.T_CUSTOMIZE A
+		WHERE
+			A.S_ID = #{id}
+			AND A.S_PARENT = #{parent}
+			<if test='group!=null and !group.equals("")'>
+			AND A.S_GROUP = #{group}
+			</if>
+			<if test='status!=null and !status.equals("")'>
+			AND S_STATUS = #{status}
+			</if>
+			<if test='visible!=null and !visible.equals("")'>
+			AND S_VISIBLE = #{visible}
+			</if>
+		ORDER BY
+			A.N_INDEX ASC
+	</select>
+	
+	<select id="getCustomAttr" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			*,
+			'${group}' s_group
+		FROM
+		(
+			SELECT
+				S_ATTR s_key,
+				S_VALUE s_value,
+				2 priority
+			FROM
+				DB_ALLPET.T_CUSTOMIZE_INFO
+			WHERE
+				S_CMID = (SELECT S_CMID FROM DB_ALLPET.T_CUSTOMIZE WHERE S_GROUP = #{group} AND S_ID = #{id})
+			UNION
+			SELECT
+				S_LCODE s_key,
+				S_VALUE s_value,
+				1 priority
+			FROM
+				DB_ALLPET.T_CUSTOM_CATEGORY
+			WHERE
+				S_GROUP = #{group}
+				AND S_LCODE != 'ATTRS'
+		) A
+		GROUP BY s_key
+	</select>
+	
+	<select id="getCustomAttrById" parameterType="string" resultType="hashmap">
+		SELECT
+			*
+		FROM
+		(
+			SELECT
+				S_ATTR s_key,
+				S_VALUE s_value,
+				2 priority
+			FROM
+				DB_ALLPET.T_CUSTOMIZE_INFO
+			WHERE
+				S_CMID = #{value}
+			UNION
+			SELECT
+				S_LCODE s_key,
+				S_VALUE s_value,
+				1 priority
+			FROM
+				DB_ALLPET.T_CUSTOM_CATEGORY
+			WHERE
+				S_GROUP = (SELECT S_GROUP FROM DB_ALLPET.T_CUSTOMIZE WHERE S_CMID = #{value})
+				AND S_LCODE != 'ATTRS'
+		) A
+		GROUP BY s_key
+	</select>
+	
+	<insert id="insertCustomInfo" parameterType="hashmap">
+		INSERT INTO DB_ALLPET.T_CUSTOMIZE_INFO
+		(
+			S_CMID,
+			S_ATTR,
+			S_VALUE
+		)
+		VALUES
+		(
+			#{cmid},
+			#{attr},
+			#{value}
+		)
+		ON DUPLICATE KEY UPDATE
+			S_VALUE = #{value}
+	</insert>
+	
+	<update id="updateCustomStatus" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_CUSTOMIZE
+		SET
+			<if test='status!=null and !status.equals("")'>
+			S_STATUS = #{status},
+			</if>
+			S_CMID = S_CMID
+		WHERE
+			S_CMID = #{cmid}
+	</update>
+		
+	<select id="getCustomWithAttrs" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			C.S_CMID,
+			C.attr_description,
+			GROUP_CONCAT(IF(I.S_ATTR = 'NAME',I.s_value,'') SEPARATOR '') AS attr_name
+			<foreach collection="infoAttr" item="iai" separator=",">
+			GROUP_CONCAT(IF(I.S_ATTR = #{iai.s_value},I.s_value,'') SEPARATOR '') AS ${iai.value_name}
+			</foreach>
+		FROM
+			(
+				SELECT
+					C.S_CMID,
+					GROUP_CONCAT(IF(R.S_LCODE = 'DESCRIPTION',R.s_value,'') SEPARATOR '') AS attr_description
+				FROM
+					T_CUSTOMIZE C, T_CUSTOM_CATEGORY R
+				WHERE
+					C.S_KEY = R.S_GROUP
+					AND C.S_GROUP = 'MAIN_MENU'
+				GROUP BY
+					C.S_CMID
+			) C, T_CUSTOMIZE_INFO I
+		WHERE
+			C.S_CMID = I.S_CMID
+		GROUP BY
+			C.S_CMID
+	</select>
+	
+	<select id="getCustomChild" parameterType="string" resultType="hashmap">
+		SELECT
+			A.s_value s_key,
+			B.s_value
+		FROM
+			(
+				SELECT
+					S_VALUE
+				FROM
+					DB_ALLPET.T_CUSTOM_CATEGORY
+				WHERE
+					S_GROUP = #{value}
+					AND S_LCODE = 'CHILDREN'
+			) A, DB_ALLPET.T_CUSTOM_CATEGORY B
+		WHERE
+			A.S_VALUE = B.S_GROUP
+			AND B.S_LCODE = 'NAME'
+		<!-- SELECT
+			S_VALUE
+		FROM
+			T_CUSTOM_CATEGORY
+		WHERE
+			S_GROUP = #{value}
+			AND S_LCODE = 'CHILDREN' -->
+	</select>
+	
+	
+	
+	<select id="getCustomCategoryByGroup" parameterType="string" resultType="hashmap">
+		SELECT
+			s_group,
+			s_lcode,
+			s_mcode,
+			s_value
+		FROM
+			DB_ALLPET.T_CUSTOM_CATEGORY
+		WHERE
+			S_GROUP = #{value}
+	</select>
+	
+	<select id="getCustomCategory" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_group,
+			s_lcode,
+			s_mcode,
+			s_value
+		FROM
+			DB_ALLPET.T_CUSTOM_CATEGORY
+		WHERE
+			S_GROUP = #{group}
+			<if test='lcode != null and !lcode.equals("")'>
+			AND S_LCODE = #{lcode}
+			</if>
+			<if test='mcode != null and !mcode.equals("")'>
+			AND S_MCODE = #{mcode}
+			</if>
+			<if test='status != null and !status.equals("")'>
+			AND S_SCODE = #{scode}
+			</if>
+	</select>
+	
+	<select id="getDefaultCustomCategory" resultType="hashmap">
+		SELECT
+			*
+		FROM
+			(
+				SELECT
+					GROUP_CONCAT(IF(S_LCODE = 'PARENT',s_value,'') SEPARATOR '') AS _PARENT,
+					GROUP_CONCAT(IF(S_LCODE = 'GROUP',s_value,'') SEPARATOR '') AS _GROUP,
+					GROUP_CONCAT(IF(S_LCODE = 'ID',s_value,'') SEPARATOR '') AS _ID,
+					GROUP_CONCAT(IF(S_LCODE = 'LEVEL',s_value,'') SEPARATOR '') AS _LEVEL,
+					GROUP_CONCAT(IF(S_LCODE = 'INDEX',s_value,'') SEPARATOR '') AS _INDEX,
+					GROUP_CONCAT(IF(S_LCODE = 'NAME',s_value,'') SEPARATOR '') AS _NAME
+				FROM
+					DB_ALLPET.T_CUSTOM_CATEGORY
+				WHERE
+				 	S_GROUP = 'PET_CUSTOM_DEFAULT'
+				GROUP BY S_MCODE
+			) A
+		ORDER BY A._LEVEL, A._PARENT, A._INDEX
+	</select>
+	
+	<select id="getCustomCategoryByParent" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_group,
+			S_LCODE s_key,
+			S_VALUE s_value
+		FROM
+			DB_ALLPET.T_CUSTOM_CATEGORY
+		WHERE
+			S_GROUP IN (
+							SELECT S_GROUP
+							FROM DB_ALLPET.T_CUSTOMIZE
+							WHERE S_PARENT = #{parent}
+								AND S_ID = #{id}
+								<if test='status!=null and !status.equals("")'>
+								AND S_STATUS = #{status}
+								</if>
+						)
+			AND S_LCODE != 'ATTRS'
+	</select>
+	
+	<select id="getCustomInfoByParent" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_cmid,
+			S_ATTR s_key,
+			S_VALUE s_value
+		FROM
+			DB_ALLPET.T_CUSTOMIZE_INFO
+		WHERE
+			S_CMID IN (
+						SELECT S_CMID
+						FROM DB_ALLPET.T_CUSTOMIZE
+						WHERE S_PARENT = #{parent}
+							AND S_ID = #{id}
+							<if test='status!=null and !status.equals("")'>
+							AND S_STATUS = #{status}
+							</if>
+					)
+	</select>
+	
+</mapper>

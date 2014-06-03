@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+
+<mapper namespace="Common.StatusInfo">
+
+	<insert id="insertOrUpdate" parameterType="hashmap">
+		INSERT INTO DB_ALLPET.T_HOSPITAL_STATUS_INFO(
+			S_ID,
+			S_GROUP,
+			S_LCODE,
+			S_MCODE,
+			S_SCODE,
+			S_TYPE,
+			<if test='field_name!=null and !field_name.equals("S_STATUS")'>
+			${field_name},
+			</if>
+			S_STATUS,
+			N_LV
+		)
+		VALUES
+		(
+			#{id},
+			#{group},
+			#{lcode},
+			#{mcode},
+			#{scode},
+			#{type},
+			<if test='field_name!=null and !field_name.equals("S_STATUS")'>
+			#{val},
+			</if>
+			#{status},
+			${lv}
+		)
+		ON DUPLICATE KEY UPDATE
+			${field_name} = #{val},
+			S_STATUS = #{status}
+	</insert>
+	
+	<select id="getStatusInfo" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_id,
+			s_group,
+			s_lcode,
+			s_mcode,
+			s_scode,
+			s_type,
+			s_sval,
+			s_lval,
+			s_status,
+			n_lv
+		FROM
+			DB_ALLPET.T_HOSPITAL_STATUS_INFO
+		WHERE
+			S_ID = #{id}
+			<if test='s_group != null and !s_group.equals("")'>
+			AND S_GROUP = #{s_group}
+			</if>
+			<if test='s_lcode != null and !s_lcode.equals("")'>
+			AND S_LCODE = #{s_lcode}
+			</if>
+			<if test='s_mcode != null and !s_mcode.equals("")'>
+			AND S_MCODE = #{s_mcode}
+			</if>
+			<if test='s_scode != null and !s_scode.equals("")'>
+			AND S_SCODE = #{s_scode}
+			</if>
+	</select>
+	
+	<select id="getInfo" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_id,
+			s_group,
+			s_lcode,
+			s_mcode,
+			s_scode,
+			s_type, 
+			CASE WHEN S_TYPE = 'SVAL' THEN S_SVAL
+			WHEN S_TYPE = 'LVAL' THEN S_LVAL
+			ELSE S_STATUS
+			END AS s_val,
+			s_status,
+			CASE WHEN N_LV = 1 THEN S_GROUP
+			WHEN N_LV = 2 THEN S_LCODE
+			WHEN N_LV = 3 THEN S_MCODE
+			WHEN N_LV = 4 THEN S_SCODE
+			ELSE ''
+			END AS s_name
+		FROM
+			DB_ALLPET.T_HOSPITAL_STATUS_INFO
+		WHERE
+			S_ID = #{id}
+			<if test='group != null and !group.equals("")'>
+			AND S_GROUP = #{group}
+			</if>
+			<if test='lcode != null and !lcode.equals("")'>
+			AND S_LCODE = #{lcode}
+			</if>
+			<if test='mcode != null and !mcode.equals("")'>
+			AND S_MCODE = #{mcode}
+			</if>
+			<if test='scode != null and !scode.equals("")'>
+			AND S_SCODE = #{scode}
+			</if>
+	</select>
+	
+</mapper>

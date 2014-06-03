@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+
+<mapper namespace="Admin.Total.Hospital">
+	<!-- 샵 > 검색 리스트 -->
+	<select id="getListCnt" parameterType="hashmap" resultType="string" >
+		SELECT
+			COUNT(S_SID)
+		FROM 
+				DB_ALLPET.T_HOSPITAL_BASIC_INFO A 
+		WHERE
+			1=1
+			<choose>
+				<when test='search_type != null and search_type.equals("name")'>
+				AND A.S_HOSPITAL_NAME LIKE ('%${search_value}%')
+				</when>
+			</choose>
+		<if test='state != null and state != ""'>
+			AND
+				A.S_STATE = #{state}
+		</if>
+	</select>
+	
+	<!-- 샵 > 검색 리스트 -->
+	<select id="getList" parameterType="hashmap" resultType="hashmap">
+		SELECT 
+			A.s_sid,
+			A.s_hospital_id,
+			DATE_FORMAT(A.d_reg_date, '%Y-%m-%d %H:%i:%s') AS d_reg_date,
+			A.s_reg_user,
+			DATE_FORMAT(A.d_update_date, '%Y-%m-%d %H:%i:%s') AS d_update_date, 
+			A.s_update_user,
+			A.s_hospital_name,
+			AD.s_old_addr_sido,
+			AD.s_old_addr_sigungu,
+			AD.s_old_addr_dong,
+			A.s_status,
+			B.s_team,
+			B.s_aid,
+			B.s_name,
+			(SELECT COUNT(*) FROM DB_ALLPET.T_HOSPITAL_USER_POINT WHERE S_SID = A.S_SID AND S_TYPE = 'H2U') pay_count,
+			(SELECT SUM(n_point) FROM DB_ALLPET.T_HOSPITAL_USER_POINT WHERE S_SID = A.S_SID) minus_sum
+		FROM 
+			DB_ALLPET.T_HOSPITAL_BASIC_INFO A
+			LEFT OUTER JOIN
+			DB_ALLPET.T_HOSPITAL_ADDRESS AD
+			ON A.S_SID = AD.S_SID
+			LEFT OUTER JOIN
+			DB_ALLPET.T_ADMINISTRATOR B
+			ON A.s_aid = B.s_aid AND B.s_position != '.'
+		WHERE
+			1=1
+			<choose>
+				<when test='search_type != null and search_type.equals("name")'>
+				AND A.S_HOSPITAL_NAME LIKE ('%${search_value}%')
+				</when>
+			</choose>
+		<if test='state != null and state != ""'>
+			AND
+				A.S_STATE = #{state}
+		</if>
+		ORDER BY 
+			A.D_REG_DATE DESC
+		<if test='startRow != null and startRow != ""'>
+		LIMIT ${startRow}, ${endRow}
+		</if>
+	</select>
+	
+	<select id="getInfoForUpdate" parameterType="string" resultType="hashmap">
+		SELECT
+			BI.s_sid,
+			BI.s_hospital_name,
+			BI.s_hospital_id,
+			BI.s_hospital_pw,
+			BI.s_domain,
+			
+			BI.s_status,
+			BI.d_reg_date,
+			BI.s_reg_user,
+			BI.d_update_date,
+			BI.s_update_user,
+			BI.s_president,
+			BI.s_corp_reg_number,
+			BI.s_bank,
+			BI.s_account_number,
+			BI.s_account_holder,
+			
+			MI.s_manage_tel,
+			
+			AD.s_old_addr_sido,
+			AD.s_old_addr_sigungu,
+			AD.s_old_addr_dong,
+			AD.s_old_addr_etc,
+			AD.s_old_zipcode,
+			
+			B.s_team,
+			B.s_aid,
+			B.s_name
+		FROM
+			DB_ALLPET.T_HOSPITAL_BASIC_INFO BI
+			LEFT OUTER JOIN
+			DB_ALLPET.T_HOSPITAL_MORE_INFO MI
+			ON BI.S_SID = MI.S_SID
+			LEFT OUTER JOIN
+			DB_ALLPET.T_HOSPITAL_ADDRESS AD
+			ON BI.S_SID = AD.S_SID
+			LEFT OUTER JOIN
+			DB_ALLPET.T_ADMINISTRATOR B
+			ON BI.S_AID = B.S_AID AND B.s_position != '.'
+		WHERE
+			BI.S_SID = #{value}
+	</select>
+	
+	<select id="getIdDuplicated" parameterType="hashmap" resultType="string">
+		SELECT
+			BI.s_sid
+		FROM
+			DB_ALLPET.T_HOSPITAL_BASIC_INFO BI
+		WHERE
+			S_HOSPITAL_ID = #{hospital_id}
+			AND S_SID != #{sid}
+	</select>
+	
+	<update id="initHospitalPw" parameterType="string">
+		UPDATE
+			DB_ALLPET.T_HOSPITAL_BASIC_INFO
+		SET
+			S_HOSPITAL_PW = S_HOSPITAL_ID
+		WHERE
+			S_SID = #{value}
+	</update>
+	
+	<update id="updateBasicInfo" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_HOSPITAL_BASIC_INFO
+		SET
+			S_HOSPITAL_NAME = #{hospital_name},
+			S_HOSPITAL_ID = #{hospital_id},
+			S_STATUS = #{status},
+			D_UPDATE_DATE = NOW(),
+			S_UPDATE_USER = #{reg_user},
+			S_AID = #{aid}
+			
+			<if test='domain != null and !domain.equals("")'>
+			,S_DOMAIN = #{domain}
+			</if>
+			<if test='corp_reg_number != null and !corp_reg_number.equals("")'>
+			,S_CORP_REG_NUMBER = #{corp_reg_number}
+			</if>
+			<if test='president != null and !president.equals("")'>
+			,S_PRESIDENT = #{president}
+			</if>
+			<if test='bank != null and !bank.equals("")'>
+			,S_BANK = #{bank}
+			</if>
+			<if test='account_number != null and !account_number.equals("")'>
+			,S_ACCOUNT_NUMBER = #{account_number}
+			</if>
+			<if test='account_holder != null and !account_holder.equals("")'>
+			,S_ACCOUNT_HOLDER = #{account_holder}
+			</if>
+		WHERE
+			S_SID = #{sid}
+	</update>
+	
+	<insert id="insertBasicInfo" parameterType="hashmap">
+		INSERT INTO DB_ALLPET.T_HOSPITAL_BASIC_INFO
+		(
+			S_SID,
+			S_S_SID,
+			S_HOSPITAL_NAME,
+			S_HOSPITAL_ID,
+			S_HOSPITAL_PW,
+			S_STATUS,
+			D_REG_DATE,
+			S_REG_USER,
+			D_UPDATE_DATE,
+			S_UPDATE_USER,
+			S_AID
+			
+			<if test='domain != null and !domain.equals("")'>
+			,S_DOMAIN
+			</if>
+			<if test='corp_reg_number != null and !corp_reg_number.equals("")'>
+			,S_CORP_REG_NUMBER
+			</if>
+			<if test='president != null and !president.equals("")'>
+			,S_PRESIDENT
+			</if>
+			<if test='bank != null and !bank.equals("")'>
+			,S_BANK
+			</if>
+			<if test='account_number != null and !account_number.equals("")'>
+			,S_ACCOUNT_NUMBER
+			</if>
+			<if test='account_holder != null and !account_holder.equals("")'>
+			,S_ACCOUNT_HOLDER
+			</if>
+		)
+		VALUE
+		(
+			#{sid},
+			#{ssid},
+			#{hospital_name},
+			#{hospital_id},
+			#{hospital_id},
+			#{status},
+			NOW(),
+			#{reg_user},
+			NOW(),
+			#{reg_user},
+			#{aid}
+			
+			<if test='domain != null and !domain.equals("")'>
+			,#{domain}
+			</if>
+			<if test='corp_reg_number != null and !corp_reg_number.equals("")'>
+			,#{corp_reg_number}
+			</if>
+			<if test='president != null and !president.equals("")'>
+			,#{president}
+			</if>
+			<if test='bank != null and !bank.equals("")'>
+			,#{bank}
+			</if>
+			<if test='account_number != null and !account_number.equals("")'>
+			,#{account_number}
+			</if>
+			<if test='account_holder != null and !account_holder.equals("")'>
+			,#{account_holder}
+			</if>
+		)
+	</insert>
+	
+	<insert id="insertOrUpdateOldAddressInfo" parameterType="hashmap">
+		INSERT INTO DB_ALLPET.T_HOSPITAL_ADDRESS
+		(
+			S_SID,
+			S_OLD_ADDR_SIDO,
+			S_OLD_ADDR_SIGUNGU,
+			S_OLD_ADDR_DONG,
+			S_OLD_ADDR_ETC,
+			S_OLD_ZIPCODE,
+			N_LATITUDE,
+			N_LONGITUDE
+		)
+		VALUES
+		(
+			#{sid},
+			#{old_addr_sido},
+			#{old_addr_sigungu},
+			#{old_addr_dong},
+			#{old_addr_etc},
+			#{old_zipcode},
+			#{n_latitude},
+			#{n_longitude}
+		)
+		ON DUPLICATE KEY UPDATE
+			S_OLD_ADDR_SIDO = #{old_addr_sido},
+			S_OLD_ADDR_SIGUNGU = #{old_addr_sigungu},
+			S_OLD_ADDR_DONG = #{old_addr_dong},
+			S_OLD_ADDR_ETC = #{old_addr_etc},
+			S_OLD_ZIPCODE = #{old_zipcode},
+			N_LATITUDE = #{n_latitude},
+			N_LONGITUDE = #{n_longitude}
+	</insert>
+	
+	<insert id="insertOrUpdateMoreInfo" parameterType="hashmap">
+		INSERT INTO DB_ALLPET.T_HOSPITAL_MORE_INFO
+		(
+			S_SID,
+			S_MANAGE_TEL
+		)
+		VALUE
+		(
+			#{sid},
+			#{manage_tel}
+		)
+		ON DUPLICATE KEY UPDATE
+			S_MANAGE_TEL = #{manage_tel}
+	</insert>
+	
+</mapper>

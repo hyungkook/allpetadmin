@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+<mapper namespace="Admin.Hospital.Vaccine">
+	
+	<select id="getByType" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_vcid,
+			n_index,
+			n_term,
+			s_term_type,
+			s_name,
+			s_comment,
+			s_sid,
+			s_type
+		FROM
+			DB_ALLPET.T_VACCINE_GROUP
+		WHERE
+			S_TYPE = #{type}
+			AND S_SID = #{sid}
+	</select>
+	
+	<select id="getVaccineList" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			C.group_type,
+			C.t,
+			C.ind,
+			C.term,
+			C.term_type,
+			C.len
+		FROM
+		(
+			SELECT
+				A.s_sid,
+				A.s_type t,
+				A.s_vcid,
+				A.s_group_type group_type,
+				A.n_index ind,
+				A.n_term term,
+				A.s_term_type term_type,
+				n_length len
+			FROM
+				DB_ALLPET.T_VACCINE_DETAIL A
+			WHERE
+				A.S_SID = #{sid}
+				AND S_GROUP_TYPE = #{group_type}
+			UNION
+			SELECT
+				A.s_sid,
+				A.s_type t,
+				A.s_vcid,
+				A.s_group_type group_type,
+				A.n_index ind,
+				A.n_term term,
+				A.s_term_type term_type,
+				n_length len
+			FROM
+				DB_ALLPET.T_VACCINE_DETAIL A
+			WHERE
+				A.S_SID = 'sid_common'
+				AND S_GROUP_TYPE = #{group_type}
+		) C
+		GROUP BY C.t
+	</select>
+	
+	<select id="getHospitalVaccine" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_sid,
+			s_type,
+			s_vcid,
+			s_group_type,
+			n_index,
+			n_term,
+			s_term_type,
+			n_length
+		FROM
+			DB_ALLPET.T_VACCINE_DETAIL
+		WHERE
+			S_SID = #{sid}
+			AND S_GROUP_TYPE = #{group_type}
+	</select>
+	
+	<insert id="insertVaccineDetail">
+		INSERT INTO DB_ALLPET.T_VACCINE_DETAIL
+		(
+			S_VCD_ROW,
+			S_VCID,
+			N_INDEX,
+			N_TERM,
+			S_TERM_TYPE,
+			S_TYPE,
+			S_SID,
+			S_GROUP_TYPE,
+			N_LENGTH,
+			S_SPECIES
+		)
+		VALUES
+		(
+			#{vcd_row},
+			#{vcid},
+			${index},
+			${term},
+			#{term_type},
+			#{type},
+			#{sid},
+			#{group_type},
+			${length},
+			#{species}
+		)
+	</insert>
+	
+	<update id="updateVaccineDetail">
+		UPDATE DB_ALLPET.T_VACCINE_DETAIL
+		SET
+			N_TERM = ${term},
+			N_LENGTH = ${len}
+		WHERE
+			S_SID = #{sid}
+			AND S_GROUP_TYPE = #{group_type}
+	</update>
+	
+</mapper>

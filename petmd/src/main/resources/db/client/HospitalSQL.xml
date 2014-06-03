@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+
+<mapper namespace="Client.Hospital">
+	
+	<select id="getHomeInfo" parameterType="string" resultType="hashmap">
+		SELECT
+			BI.s_sid,
+			BI.s_hospital_name,
+			BI.s_hospital_id,
+			BI.s_hospital_pw,
+			BI.s_status,
+			BI.d_reg_date,
+			BI.s_reg_user,
+			BI.d_update_date,
+			BI.s_update_user,
+			BI.s_president,
+			BI.s_corp_reg_number,
+			BI.s_company_name,
+			MI.s_introduce,
+			MI.s_keyword,
+			MI.s_display_tel,
+			MI.s_tel,
+			MI.s_parking_info,
+			MI.s_credit_info,
+			MI.s_email,
+			MI.s_fax,
+			MI.s_represent_staff,
+			(
+				SELECT
+					s_name
+				FROM
+					DB_ALLPET.T_STAFF_INFO
+				WHERE
+					S_STID = MI.s_represent_staff 
+			) s_represent_staff_name,
+			(
+				SELECT
+					COUNT(*)
+				FROM
+					DB_ALLPET.T_STAFF_INFO
+				WHERE
+					S_SID = #{value}
+					AND S_STATE = 'Y'
+			) s_staff_count
+		FROM
+			DB_ALLPET.T_HOSPITAL_BASIC_INFO BI, DB_ALLPET.T_HOSPITAL_MORE_INFO MI
+		WHERE
+			BI.S_SID = MI.S_SID
+			AND BI.S_SID = #{value}
+	</select>
+	
+	<select id="getSimpleHospitalInfo" parameterType="string" resultType="hashmap">
+		SELECT
+			BI.s_sid,
+			BI.s_hospital_name
+		FROM
+			DB_ALLPET.T_HOSPITAL_BASIC_INFO BI
+		WHERE
+			BI.S_SID = #{value}
+	</select>
+	
+	<select id="getAddressInfo" parameterType="string" resultType="hashmap">
+		SELECT
+			(SELECT s_hospital_name FROM DB_ALLPET.T_HOSPITAL_BASIC_INFO WHERE S_SID = #{value}) s_hospital_name,
+			BI.s_old_addr_sido,
+			BI.s_old_addr_sigungu,
+			BI.s_old_addr_dong,
+			BI.s_old_addr_etc,
+			BI.s_old_zipcode,
+			BI.n_latitude,
+			BI.n_longitude,
+			MI.s_display_tel,
+			MI.s_tel
+		FROM
+			DB_ALLPET.T_HOSPITAL_ADDRESS BI
+			LEFT OUTER JOIN
+			DB_ALLPET.T_HOSPITAL_MORE_INFO MI
+			ON BI.S_SID = MI.S_SID
+		WHERE
+			BI.S_SID = #{value}
+	</select>
+	
+	<select id="getWorkingTime" parameterType="string" resultType="hashmap">
+		SELECT
+			s_sid,
+			n_index,
+			s_name,
+			s_start_time,
+			s_end_time,
+			s_alltime,
+			s_dayoff,
+			s_comment
+		FROM
+			DB_ALLPET.T_HOSPITAL_WORKING_TIME
+		WHERE
+			S_SID = #{value}
+	</select>
+	
+	
+	
+	<select id="getImageByKey" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_iid,
+			s_image_path
+		FROM
+			DB_ALLPET.T_IMAGE
+		WHERE
+			S_SID = #{sid}
+			AND S_LKEY = #{key}
+		ORDER BY N_INDEX
+	</select>
+	
+	<select id="getImageInKey" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_iid,
+			s_image_path,
+			S_LKEY
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					DB_ALLPET.T_IMAGE
+				WHERE
+					S_SID = #{sid}
+				ORDER BY
+					N_INDEX
+			) AS A
+		WHERE A.S_LKEY IN ${keys}
+	</select>
+	
+	<select id="getImage" parameterType="string" resultType="hashmap">
+		SELECT
+			s_iid,
+			s_image_path
+		FROM
+			DB_ALLPET.T_IMAGE
+		WHERE
+			S_SID = #{value}
+		ORDER BY
+			N_INDEX
+	</select>
+	
+	<select id="getSite" parameterType="string" resultType="hashmap">
+		SELECT
+			s_type,
+			(SELECT S_VALUE FROM DB_ALLPET.T_ELEMENT WHERE S_KEY = S_TYPE AND S_GROUP = 'HOSPITAL_SITE') AS s_type_name,
+			s_url
+		FROM
+			DB_ALLPET.T_HOSPITAL_SITE
+		WHERE
+			S_SID = #{value}
+	</select>
+	
+</mapper>

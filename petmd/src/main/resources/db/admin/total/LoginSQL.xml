@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+
+<mapper namespace="totalLogin">
+	<!-- 샵 기본 정보 -->
+	<select id="getAdminLoginInfo"  resultType="hashmap" parameterType="hashmap">
+		SELECT
+			`s_aid`, 
+			`s_password`, 
+			`s_name`, 
+			`s_tel`, 
+			`s_department`, 
+			`s_cphone`, 
+			`s_position`, 
+			`s_email`, 
+			`s_level`, 
+			`s_team`, 
+			`s_userid`, 
+			`s_register`, 
+			`s_regdate`, 
+			`s_state`, 
+			`s_comment`, 
+			`d_visit_date`, 
+			N_COUNT AS `n_fail_count`
+		FROM
+			DB_ALLPET.T_ADMINISTRATOR
+		  <if test="service != null and service == 'medilatte'">
+		  WHERE S_AID = #{s_userid}
+		  		  AND S_PASSWORD = #{s_password}
+		  </if>
+		  <if test="service == null or service != 'medilatte'">
+		  WHERE S_USERID = #{s_userid}
+		  AND S_PASSWORD = #{s_password}
+		  </if>
+	</select>
+	
+	<insert id="updateAdminFailCount" parameterType="hashmap">
+		UPDATE 
+			DB_ALLPET.T_ADMINISTRATOR
+		SET 
+			D_VISIT_DATE = NOW(),
+			N_COUNT = #{n_fail_count}
+		WHERE 
+			S_USERID = #{s_userid} 
+	</insert>
+	
+	<select id="getAdminFailCount" parameterType="hashmap" resultType="string">
+		SELECT 
+			N_COUNT AS n_fail_count
+		FROM 
+			DB_ALLPET.T_ADMINISTRATOR
+		WHERE 
+			S_USERID = #{s_userid}	
+	</select>
+	
+	<!-- 통합관리자 메뉴 정보 가져오기  -->
+	<select id="selectFullPermission" resultType="hashmap">
+		SELECT 
+			TE.S_GROUP s_main_menu, 
+			TE.S_KEY s_sub_menu, 
+			TE.S_VALUE s_link_name, 
+			TEMP.S_VALUE s_url
+		FROM DB_ALLPET.T_ELEMENT TE LEFT OUTER JOIN 
+				(
+				SELECT 
+					T2.S_KEY, 
+					T1.S_VALUE
+				FROM 
+					DB_ALLPET.T_ELEMENT  T1, DB_ALLPET.T_ELEMENT T2
+				WHERE 
+					T1.S_GROUP = T2.S_KEY
+					AND T1.S_KEY = 9999		
+				) TEMP 
+				ON TE.S_KEY = TEMP.S_KEY
+		WHERE 
+			TE.S_GROUP LIKE ('P%') 
+			AND TE.S_KEY <![CDATA[<>]]> 9999
+	</select>
+	
+	<!-- 통합관리자 관리자 메뉴 정보  -->
+	<select id="selectAdminIdToPermission" parameterType="java.lang.String" resultType="hashmap">
+		SELECT 
+			TE.S_GROUP s_main_menu,
+			TE.S_KEY s_sub_menu, 
+			TE.S_NAME s_link_name,
+			TE.S_URL s_url
+		FROM 
+			DB_ALLPET.T_ADMINISTRATOR_PERMISSION TAP , 
+			(
+			SELECT 
+				T2.S_GROUP,
+				T2.S_KEY, 
+				T2.S_VALUE S_NAME,
+				T1.S_VALUE S_URL
+			FROM 
+				DB_ALLPET.T_ELEMENT T1, 
+				DB_ALLPET.T_ELEMENT T2
+			WHERE 
+				T1.S_GROUP = T2.S_KEY
+				AND T1.S_KEY = 9999	
+			) TE
+		WHERE 
+			TAP.`S_MAIN_MENU` = TE.S_GROUP
+			AND TAP.`S_SUB_MENU` = TE.S_KEY
+			AND TAP.S_AID = #{value}
+	</select>
+	
+	<select id="selectAdminPermissionPage" resultType="java.lang.String" parameterType="java.lang.String">
+		SELECT COUNT(S_GROUP) value 
+		FROM DB_ALLPET.T_ELEMENT 
+		WHERE S_VALUE = #{value} 
+	</select>
+</mapper>

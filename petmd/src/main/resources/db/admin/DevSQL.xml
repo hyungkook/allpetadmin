@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+
+<mapper namespace="Dev">
+
+	<insert id="insertUserPoint" parameterType="string">
+		INSERT INTO DB_ALLPET.T_HOSPITAL_USER_POINT
+		(
+			S_HUPID,
+			S_UID,
+			S_SID,
+			S_TYPE,
+			N_POINT,
+			S_DESC,
+			D_REG_DATE
+		)
+		VALUES
+		${value}
+	</insert>
+	
+	<select id="inTest" parameterType="hashmap" resultType="hashmap">
+		SELECT *
+		FROM DB_ALLPET.T_CUSTOMIZE
+		WHERE S_CMID IN
+		<foreach collection="ids" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="getCustomItem1" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			C.s_cmid,
+			C.s_value,
+			<foreach collection="sss" item="it" separator=",">
+			GROUP_CONCAT(IF(I.S_ATTR = #{it[0]},I.s_value,'') SEPARATOR '') AS ${it[1]}
+			</foreach>
+		FROM
+			DB_ALLPET.T_CUSTOMIZE C, DB_ALLPET.T_CUSTOMIZE_INFO I
+		WHERE
+			C.S_PARENT = #{parent}
+			AND C.S_CMID = I.S_CMID
+		GROUP BY
+			C.S_CMID
+			<!-- AND C.S_CMID = #{cmid} -->
+	</select>
+	
+	<update id="valueSwitching" parameterType="hashmap">
+		UPDATE DB_ALLPET.${table_name} SET ${value_field} = CASE 
+			WHEN ${key_field} = #{frontKey} THEN (SELECT * FROM (SELECT A.${value_field} FROM DB_ALLPET.${table_name} A WHERE A.${key_field} = #{backKey}) AS B)
+			WHEN ${key_field} = #{backKey} THEN (SELECT * FROM (SELECT A.${value_field} FROM DB_ALLPET.${table_name} A WHERE A.${key_field} = #{frontKey}) AS B)
+		ELSE
+			${value_field}
+		END
+		WHERE ${key_field} IN (#{frontKey}, #{backKey});
+	</update>
+	
+	<select id="getTableColumnNames" parameterType="hashmap">
+		SELECT
+			COLUMN_NAME name
+		FROM
+			INFORMATION_SCHEMA.COLUMNS
+		WHERE
+			TABLE_NAME = #{table_name}
+			AND TABLE_SCHEMA = #{db_name}
+	</select>
+	
+	<!-- <update id="updatetest1" parameterType="array">
+
+	UPDATE DB_ALLPET.T_TEST SET S_VAL = 't2' WHERE S_KEY1 = '5';
+	UPDATE DB_ALLPET.T_TEST SET S_VAL = 't3' WHERE S_KEY1 = '6';
+	</update> -->
+	
+</mapper>

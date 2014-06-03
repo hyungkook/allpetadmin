@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+
+<mapper namespace="Admin.Hospital">
+		
+	<update id="updateTelInfo" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_HOSPITAL_MORE_INFO
+		SET
+			S_DISPLAY_TEL = #{display_tel},
+			S_TEL = #{tel}
+		WHERE
+			S_SID = #{sid}
+	</update>
+	
+	<update id="updateIntroInfo" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_HOSPITAL_MORE_INFO
+		SET
+			S_INTRODUCE = #{introduce},
+			S_KEYWORD = #{keyword},
+			S_REPRESENT_STAFF = #{represent_staff}
+		WHERE
+			S_SID = #{sid}
+	</update>
+	
+	<update id="updateExtraInfo" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_HOSPITAL_MORE_INFO
+		SET
+			S_PARKING_INFO = #{parking_info},
+			S_CREDIT_INFO = #{credit_info}
+		WHERE
+			S_SID = #{sid}
+	</update>
+	
+	<update id="updateAddressInfo" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_HOSPITAL_ADDRESS
+		SET
+			S_OLD_ADDR_SIDO = #{old_addr_sido},
+			S_OLD_ADDR_SIGUNGU = #{old_addr_sigungu},
+			S_OLD_ADDR_DONG = #{old_addr_dong},
+			S_OLD_ADDR_ETC = #{old_addr_etc},
+			S_OLD_ZIPCODE = #{old_zipcode},
+			N_LATITUDE = #{n_latitude},
+			N_LONGITUDE = #{n_longitude}
+		WHERE
+			S_SID = #{sid}
+	</update>
+	
+	<update id="updatePresidentInfo" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_HOSPITAL_BASIC_INFO
+		SET
+			<if test='president != null and !president.equals("")'>
+			S_PRESIDENT = #{president},
+			</if>
+			<if test='corp_reg_number != null and !corp_reg_number.equals("")'>
+			S_CORP_REG_NUMBER = #{corp_reg_number},
+			</if>
+			<if test='company_name != null and !company_name.equals("")'>
+			S_COMPANY_NAME = #{company_name},
+			</if>
+			S_SID = S_SID
+		WHERE
+			S_SID = #{sid}
+	</update>
+	
+	<update id="updateFaxEmail" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_HOSPITAL_MORE_INFO
+		SET
+			S_FAX = #{fax},
+			S_EMAIL = #{email}
+		WHERE
+			S_SID = #{sid}
+	</update>
+	
+	<insert id="insertSites" parameterType="string">
+		INSERT INTO DB_ALLPET.T_HOSPITAL_SITE
+		(
+			S_SID,
+			N_INDEX,
+			S_TYPE,
+			S_URL,
+			S_STATUS
+		)
+		VALUES
+			${value}
+	</insert>
+	
+	
+	<delete id="deleteSites" parameterType="string">
+		DELETE FROM DB_ALLPET.T_HOSPITAL_SITE WHERE S_SID = #{value}
+	</delete>
+	
+	<insert id="insertWorkingTimes" parameterType="string">
+		INSERT INTO DB_ALLPET.T_HOSPITAL_WORKING_TIME
+		(
+			S_SID,
+			N_INDEX,
+			S_NAME,
+			S_START_TIME,
+			S_END_TIME,
+			S_ALLTIME,
+			S_DAYOFF,
+			S_COMMENT
+		)
+		VALUES
+			${value}
+	</insert>
+	
+	<delete id="deleteWorkingTime" parameterType="string">
+		DELETE FROM DB_ALLPET.T_HOSPITAL_WORKING_TIME WHERE S_SID = #{value}
+	</delete>
+	
+	<select id="getCopyrightInfo" parameterType="string" resultType="hashmap">
+		SELECT
+			BI.s_president,
+			BI.s_corp_reg_number,
+			BI.s_company_name,
+			MI.s_display_tel,
+			MI.s_tel,
+			MI.s_email,
+			MI.s_fax
+		FROM
+			DB_ALLPET.T_HOSPITAL_BASIC_INFO BI, DB_ALLPET.T_HOSPITAL_MORE_INFO MI
+		WHERE
+			BI.S_SID = MI.S_SID
+			AND BI.S_SID = #{value}
+	</select>
+	
+</mapper>

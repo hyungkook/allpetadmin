@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+
+<mapper namespace="Admin.Member">
+
+	<select id="getMemberByPhone" parameterType="string" resultType="hashmap">
+		SELECT s_uid, s_cphone_number
+		FROM DB_ALLPET.T_MEMBER
+		WHERE S_CPHONE_NUMBER = #{value}
+	</select>
+	
+	<select id="getMember" parameterType="string" resultType="hashmap">
+		SELECT s_uid, s_cphone_number
+		FROM DB_ALLPET.T_MEMBER
+		WHERE S_UID = #{value}
+	</select>
+	
+</mapper>

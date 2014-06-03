@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+<mapper namespace="Admin.Hospital.Staff">
+
+	<select id="getSubContentsCnt" parameterType="list" resultType="hashmap">
+		SELECT
+			S_CATEGORY s_cmid,
+			COUNT(*) staff_cnt,
+			0 sub_cnt
+		FROM DB_ALLPET.T_STAFF_INFO
+			WHERE S_CATEGORY IN
+			<foreach collection="list" item="item" open="(" separator="," close=")">#{item}</foreach>
+			AND S_STATE = 'Y' GROUP BY S_CATEGORY
+	</select>
+
+	<delete id="deleteAllPastInfo" parameterType="string">
+		DELETE FROM DB_ALLPET.T_STAFF_PAST_INFO WHERE S_STID = #{value}
+	</delete>
+	
+	<insert id="insertPastInfoes" parameterType="string">
+		INSERT INTO DB_ALLPET.T_STAFF_PAST_INFO
+		(
+			S_STID,
+			S_TYPE,
+			N_INDEX,
+			D_START_DATE,
+			D_END_DATE,
+			S_DESC
+		)
+		VALUES
+		${value}
+	</insert>
+	
+	<insert id="insertInfo" parameterType="hashmap">
+		INSERT INTO DB_ALLPET.T_STAFF_INFO
+		(
+			S_STID,
+			S_SID,
+			S_CATEGORY,
+			S_NAME,
+			S_POSITION,
+			N_INDEX,
+			S_STATE,
+			S_WORKING_TIME,
+			S_SPECIALTY,
+			S_IID
+		)
+		VALUES
+		(
+			#{stid},
+			#{sid},
+			#{category},
+			#{name},
+			#{position},
+			IFNULL((SELECT max(A.N_INDEX)+1 FROM DB_ALLPET.T_STAFF_INFO A WHERE A.S_SID=#{sid} AND A.S_CATEGORY=#{category}),1),
+			'Y',
+			#{working_time},
+			#{specialty},
+			#{iid}
+		)
+		ON DUPLICATE KEY UPDATE
+			S_CATEGORY = #{category},
+			S_NAME = #{name},
+			S_POSITION = #{position},
+			S_WORKING_TIME = #{working_time},
+			S_SPECIALTY = #{specialty},
+			S_IID = #{iid}
+	</insert>
+	
+	<update id="removeInfo" parameterType="string">
+		UPDATE DB_ALLPET.T_STAFF_INFO
+		SET S_STATE = 'N'
+		WHERE S_STID = #{value}
+	</update>
+	
+	<update id="indexSwitching" parameterType="hashmap">
+		UPDATE DB_ALLPET.T_STAFF_INFO SET N_INDEX = CASE 
+			WHEN S_STID = #{frontId} THEN (SELECT * FROM (SELECT A.N_INDEX FROM DB_ALLPET.T_STAFF_INFO A WHERE A.S_STID = #{backId}) AS B)
+			WHEN S_STID = #{backId} THEN (SELECT * FROM (SELECT A.N_INDEX FROM DB_ALLPET.T_STAFF_INFO A WHERE A.S_STID = #{frontId}) AS B)
+		ELSE
+			N_INDEX
+		END
+		WHERE S_STID IN (#{frontId}, #{backId});
+	</update>
+	
+	<select id="getNextStaff" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			B.s_stid,
+			B.s_sid,
+			B.s_category,
+			B.s_name,
+			B.s_position,
+			B.n_index,
+			B.s_state,
+			B.s_working_time,
+			B.s_specialty,
+			B.s_iid,
+			(
+				SELECT
+					s_image_path
+				FROM
+					DB_ALLPET.T_IMAGE
+				WHERE
+					S_IID = B.S_IID
+					AND S_LKEY = 'STFF'
+			) AS image_path
+		FROM
+			(
+				SELECT
+					MIN(N_INDEX) _index, S_CATEGORY c
+				FROM
+					DB_ALLPET.T_STAFF_INFO
+				WHERE
+					<if test="state != null and !state.equals('')">
+					S_STATE = #{state} AND
+					</if>
+					N_INDEX > (SELECT N_INDEX FROM DB_ALLPET.T_STAFF_INFO WHERE S_STID = #{stid})
+					AND S_CATEGORY = (SELECT S_CATEGORY FROM DB_ALLPET.T_STAFF_INFO WHERE S_STID = #{stid})
+			) A,
+			DB_ALLPET.T_STAFF_INFO B
+		WHERE
+			A._index = B.N_INDEX
+			AND B.S_CATEGORY = c
+			<if test="state != null and !state.equals('')">
+			AND B.S_STATE = #{state}
+			</if>
+	</select>
+	
+	<select id="getPreviousStaff" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			B.s_stid,
+			B.s_sid,
+			B.s_category,
+			B.s_name,
+			B.s_position,
+			B.n_index,
+			B.s_state,
+			B.s_working_time,
+			B.s_specialty,
+			B.s_iid,
+			(
+				SELECT
+					s_image_path
+				FROM
+					DB_ALLPET.T_IMAGE
+				WHERE
+					S_IID = B.S_IID
+					AND S_LKEY = 'STFF'
+			) AS image_path
+		FROM
+			(
+				SELECT
+					MAX(N_INDEX) _index, S_CATEGORY c
+				FROM
+					DB_ALLPET.T_STAFF_INFO
+				WHERE
+					<if test="state != null and !state.equals('')">
+					S_STATE = #{state} AND
+					</if>
+					N_INDEX <![CDATA[<]]> (SELECT N_INDEX FROM DB_ALLPET.T_STAFF_INFO WHERE S_STID = #{stid})
+					AND S_CATEGORY = (SELECT S_CATEGORY FROM DB_ALLPET.T_STAFF_INFO WHERE S_STID = #{stid})
+			) A,
+			DB_ALLPET.T_STAFF_INFO B
+		WHERE
+			A._index = B.N_INDEX
+			AND B.S_CATEGORY = c
+			<if test="state != null and !state.equals('')">
+			AND B.S_STATE = #{state}
+			</if>
+	</select>
+
+</mapper>

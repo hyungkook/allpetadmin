@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+
+<mapper namespace="Admin.Point.Hospital">
+
+	<insert id="insertUserPoint" parameterType="hashmap" useGeneratedKeys="true" keyProperty="hupid">
+		INSERT INTO DB_ALLPET.T_HOSPITAL_USER_POINT
+		(
+			S_HUPID,
+			S_UID,
+			S_SID,
+			S_TYPE,
+			N_POINT,
+			S_DESC,
+			D_REG_DATE
+		)
+		VALUES
+		(
+			#{row},
+			#{uid},
+			#{sid},
+			#{type},
+			${point},
+			#{desc},
+			NOW()
+		)
+	</insert>
+	
+	<select id="getTotalPointAndUserInfo" parameterType="string" resultType="hashmap">
+		SELECT
+			P.s_uid,
+			s_name,
+			point_sum
+		FROM
+		(
+			SELECT
+				s_uid, SUM(n_point) point_sum
+			FROM
+				DB_ALLPET.T_HOSPITAL_USER_POINT
+			WHERE
+				S_UID = #{value}
+		) P,
+		(
+			SELECT
+				s_uid, s_name
+			FROM
+				DB_ALLPET.T_MEMBER
+			WHERE
+				S_UID = #{value}
+		) M
+		WHERE P.s_uid = M.s_uid
+	</select>
+	
+	<select id="getTotalPointAndUserInfoByPhone" parameterType="hashmap" resultType="hashmap">
+		<!-- SELECT
+			M.s_uid,
+			M.s_name,
+			M.s_cphone_number,
+			SUM(n_point) point_sum
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					DB_ALLPET.T_MEMBER
+				WHERE
+					S_CPHONE_NUMBER = #{phone}
+			) M,
+			(
+				SELECT
+					*
+				FROM
+					DB_ALLPET.T_HOSPITAL_USER_POINT
+				WHERE
+					S_SID = #{sid}
+			) P
+		WHERE M.s_uid = P.s_uid -->
+		SELECT
+			M.s_uid,
+			M.s_name,
+			M.s_cphone_number,
+			IFNULL(SUM(n_point),0) point_sum
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					DB_ALLPET.T_MEMBER
+				WHERE
+					S_CPHONE_NUMBER = #{phone}
+			) M LEFT OUTER JOIN
+			(
+				SELECT
+					*
+				FROM
+					DB_ALLPET.T_HOSPITAL_USER_POINT
+				WHERE
+					S_SID = #{sid}
+			) P
+		ON M.s_uid = P.s_uid
+		GROUP BY
+			M.s_uid
+	</select>
+	
+	<select id="getTotalUserPoint" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			SUM(P.N_POINT) AS sum_pt, COUNT(*) AS cnt
+		FROM
+			DB_ALLPET.T_HOSPITAL_USER_POINT P
+		<choose>
+		<when test='search_type != null and !search_type.equals("")'>
+			,(
+				SELECT
+					*
+				FROM
+					DB_ALLPET.T_MEMBER
+				WHERE
+					S_NAME LIKE '%${search_value}%'
+			) M
+		WHERE
+			P.S_UID = M.S_UID AND
+		</when>
+		<otherwise>
+		WHERE
+		</otherwise>
+		</choose>
+			S_SID = #{sid}
+			<if test='period != null and !period.equals("")'>
+			AND D_REG_DATE > FROM_UNIXTIME(UNIX_TIMESTAMP(NOW())-(86400*${period}))
+			</if>
+	</select>
+	
+	<select id="getSumUserPoint" parameterType="hashmap" resultType="string">
+		SELECT
+			SUM(N_POINT) AS sum_pt
+		FROM
+			DB_ALLPET.T_HOSPITAL_USER_POINT
+		WHERE
+			S_UID = #{uid}
+			AND S_SID = #{sid}
+	</select>
+	
+	<select id="getUserPoint" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			M.s_name,
+			M.s_cphone_number,
+			(0-P.N_POINT) AS n_point,
+			P.S_UID AS s_uid,
+			P.S_SID AS s_sid,
+			P.S_TYPE AS s_type,
+			P.S_DESC AS s_desc,
+			P.D_REG_DATE AS d_reg_date
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					DB_ALLPET.T_HOSPITAL_USER_POINT
+				WHERE
+					S_SID = #{sid}
+			) P
+			,<!-- LEFT OUTER JOIN -->
+			<choose>
+			<when test='search_type != null and !search_type.equals("")'>
+			(
+				SELECT
+					*
+				FROM
+					DB_ALLPET.T_MEMBER
+				WHERE
+					S_NAME LIKE '%${search_value}%'
+			) M
+			</when>
+			<otherwise>
+			DB_ALLPET.T_MEMBER M
+			</otherwise>
+			</choose>
+			<!-- ON  -->
+		WHERE
+			P.S_UID = M.S_UID
+		<if test='period != null and !period.equals("")'>
+			AND P.D_REG_DATE > FROM_UNIXTIME(UNIX_TIMESTAMP(NOW())-(86400*${period}))
+		</if>
+		ORDER BY d_reg_date DESC
+		<if test='startRow != null and !startRow.equals("")'>
+		LIMIT ${startRow},${endRow}
+		</if>
+	</select>
+	
+	<select id="getUserPointAccumulated" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			*
+		FROM
+			(
+				SELECT
+					M.s_name,
+					M.s_cphone_number,
+					(0-P.N_POINT) AS n_point,
+					P.S_UID AS s_uid,
+					P.S_SID AS s_sid,
+					P.S_TYPE AS s_type,
+					P.S_DESC AS s_desc,
+					P.D_REG_DATE AS d_reg_date,
+					(@AA := @AA + (0-P.N_POINT)) AS acc
+				FROM
+					(
+						SELECT
+							*
+						FROM
+							DB_ALLPET.T_HOSPITAL_USER_POINT
+						WHERE
+							S_SID = #{sid}
+					) P
+					LEFT OUTER JOIN
+					DB_ALLPET.T_MEMBER M
+					ON P.S_UID = M.S_UID,
+					(SELECT @AA:=0) XX
+				<if test='period != null and !period.equals("")'>
+				WHERE
+					P.D_REG_DATE > FROM_UNIXTIME(UNIX_TIMESTAMP(NOW())-(86400*${period}))
+				</if>
+				ORDER BY d_reg_date ASC
+				<if test='startRow != null and !startRow.equals("")'>
+				LIMIT ${startRow},${endRow}
+				</if>
+			) T
+		ORDER BY d_reg_date DESC
+	</select>
+	
+	<select id="getUserPointWithIn" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			M.s_name,
+			M.s_cphone_number,
+			IFNULL(SUM(P.N_POINT),0) AS point_sum,
+			M.S_UID AS s_uid
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					DB_ALLPET.T_MEMBER
+				WHERE
+					S_UID IN <foreach collection="list" item="item" open="(" separator="," close=")">#{item}</foreach>
+			) M
+			LEFT OUTER JOIN
+			DB_ALLPET.T_HOSPITAL_USER_POINT P
+			ON P.S_UID = M.S_UID
+		WHERE
+			S_SID = #{sid}
+		GROUP BY M.S_UID
+	</select>
+	
+</mapper>

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+<mapper namespace="Admin.Hospital.Board">
+
+	<select id="getSubContentsCnt" parameterType="list" resultType="hashmap">
+		SELECT
+			s_cmid,
+			SUM(content_cnt) content_cnt,
+			SUM(sub_cnt) sub_cnt
+		FROM
+			(
+				SELECT S_PARENT s_cmid, 0 content_cnt, COUNT(*) sub_cnt 
+				FROM DB_ALLPET.T_CUSTOMIZE 
+				WHERE S_PARENT IN
+					<foreach collection="list" item="item" open="(" separator="," close=")">#{item}</foreach>
+				GROUP BY S_PARENT
+				UNION
+				SELECT S_GROUP s_cmid, COUNT(*) content_cnt, 0 sub_cnt 
+				FROM DB_ALLPET.T_BOARD 
+				WHERE S_GROUP IN
+					<foreach collection="list" item="item" open="(" separator="," close=")">#{item}</foreach>
+					AND S_STATUS = 'Y'
+				GROUP BY S_GROUP
+				UNION
+				SELECT A.S_PARENT s_cmid, SUM(B.cnt) content_cnt, 0 sub_cnt
+				FROM DB_ALLPET.T_CUSTOMIZE A,
+				(
+					SELECT S_GROUP, COUNT(*) cnt
+					FROM DB_ALLPET.T_BOARD 
+					WHERE S_GROUP IN (SELECT S_CMID FROM DB_ALLPET.T_CUSTOMIZE WHERE S_PARENT IN
+						<foreach collection="list" item="item" open="(" separator="," close=")">#{item}</foreach>)
+						AND S_STATUS = 'Y'
+					GROUP BY S_GROUP
+				) B
+				WHERE 
+					A.S_CMID = B.S_GROUP
+				GROUP BY
+					A.S_PARENT
+			) A
+		GROUP BY
+			s_cmid
+			
+		<!-- SELECT
+			s_cmid,
+			SUM(content_cnt) content_cnt,
+			SUM(sub_cnt) sub_cnt
+		FROM
+			(
+				(
+					SELECT S_CMID s_cmid, 0 content_cnt, COUNT(*) sub_cnt 
+					FROM DB_ALLPET.T_CUSTOMIZE 
+					WHERE S_PARENT IN
+					<foreach collection="list" item="item" open="(" separator="," close=")">#{item}</foreach>
+				)
+				UNION
+				(
+					SELECT S_GROUP s_cmid, COUNT(*) content_cnt, 0 sub_cnt 
+					FROM DB_ALLPET.T_BOARD 
+					WHERE (S_GROUP IN
+						<foreach collection="list" item="item" open="(" separator="," close=")">#{item}</foreach>
+						OR S_GROUP IN (SELECT S_CMID FROM DB_ALLPET.T_CUSTOMIZE WHERE S_PARENT IN 
+							<foreach collection="list" item="item" open="(" separator="," close=")">#{item}</foreach>))
+						AND S_STATUS = 'Y'
+					GROUP BY S_GROUP
+				)
+			) A
+		GROUP BY
+			s_cmid -->
+	</select>
+
+	<update id="indexSwitching" parameterType="hashmap">
+		UPDATE DB_ALLPET.T_BOARD
+		SET
+			N_INDEX = CASE 
+				WHEN S_BID = #{frontId} THEN (SELECT * FROM (SELECT A.N_INDEX FROM DB_ALLPET.T_BOARD A WHERE A.S_BID = #{backId}) AS B)
+				WHEN S_BID = #{backId} THEN (SELECT * FROM (SELECT A.N_INDEX FROM DB_ALLPET.T_BOARD A WHERE A.S_BID = #{frontId}) AS B)
+			ELSE
+				N_INDEX
+			END
+		WHERE S_BID IN (#{frontId}, #{backId});
+	</update>
+	
+	<select id="getNextByIndex" parameterType="string" resultType="hashmap">
+		SELECT
+			B.s_bid
+		FROM
+			(
+				SELECT
+					MIN(N_INDEX) _index, S_GROUP g
+				FROM
+					DB_ALLPET.T_BOARD
+				WHERE
+					N_INDEX > (SELECT N_INDEX FROM DB_ALLPET.T_BOARD WHERE S_BID = #{value})
+					AND S_GROUP = (SELECT S_GROUP FROM DB_ALLPET.T_BOARD WHERE S_BID = #{value})
+					AND S_STATUS = 'Y'
+			) A,
+			DB_ALLPET.T_BOARD B
+		WHERE
+			A._index = B.N_INDEX
+			AND B.S_GROUP = A.g
+	</select>
+	
+	<select id="getPreviousByIndex" parameterType="string" resultType="hashmap">
+		SELECT
+			B.s_bid
+		FROM
+			(
+				SELECT
+					MAX(N_INDEX) _index, S_GROUP g
+				FROM
+					DB_ALLPET.T_BOARD
+				WHERE
+					N_INDEX <![CDATA[<]]> (SELECT N_INDEX FROM DB_ALLPET.T_BOARD WHERE S_BID = #{value})
+					AND S_GROUP = (SELECT S_GROUP FROM DB_ALLPET.T_BOARD WHERE S_BID = #{value})
+					AND S_STATUS = 'Y'
+			) A,
+			DB_ALLPET.T_BOARD B
+		WHERE
+			A._index = B.N_INDEX
+			AND B.S_GROUP = A.g
+	</select>
+	
+	<!-- <select id="getNextPriority" parameterType="string" resultType="string">
+		SELECT
+			MAX(S_PRIORITY)+1
+		FROM
+			DB_ALLPET.T_BOARD
+		WHERE
+			S_GROUP = #{value}
+	</select> -->
+	
+	<select id="getNextIndex" parameterType="string" resultType="string">
+		SELECT
+			MAX(N_INDEX)+1
+		FROM
+			DB_ALLPET.T_BOARD
+		WHERE
+			S_GROUP = #{value}
+	</select>
+	
+	<insert id="insertBoard" parameterType="hashmap">
+		INSERT INTO DB_ALLPET.T_BOARD
+		(
+			S_BID,
+			S_GROUP,
+			S_PARENT,
+			S_SUBJECT,
+			S_CONTENTS,
+			D_REG_DATE,
+			S_REG_USER,
+			D_UPDATE_DATE,
+			S_UPDATE_USER,
+			S_IID,
+			<if test='index != null and !index.equals("")'>
+			N_INDEX,
+			</if>
+			<if test="type != null and !type.equals('')">
+			S_TYPE,
+			</if>
+			S_VISIBLE
+		)
+		VALUES
+		(
+			#{bid},
+			#{group},
+			#{parent},
+			#{subject},
+			#{contents},
+			NOW(),
+			#{sid},
+			NOW(),
+			#{sid},
+			#{iid},
+			<if test='index != null and !index.equals("")'>
+			#{index},
+			</if>
+			<if test="type != null and !type.equals('')">
+			#{type},
+			</if>
+			<choose>
+			<when test='visible == null or visible.equals("") or visible.equals("Y")'>
+				'Y'
+			</when>
+			<otherwise>
+				'N'
+			</otherwise>
+			</choose>
+		)
+		ON DUPLICATE KEY UPDATE
+			<if test='group != null and !group.equals("")'>
+			S_GROUP = #{group},
+			</if>
+			<if test='parent != null and !parent.equals("")'>
+			S_PARENT = #{parent},
+			</if>
+			<if test='subject != null'>
+			S_SUBJECT = #{subject},
+			</if>
+			<if test='contents != null'>
+			S_CONTENTS = #{contents},
+			</if>
+			D_UPDATE_DATE = NOW(),
+			S_UPDATE_USER = #{sid},
+			<if test='iid != null'>
+			S_IID = #{iid},
+			</if>
+			<if test='index != null and !index.equals("")'>
+			N_INDEX = #{index},
+			</if>
+			<if test="type != null and !type.equals('')">
+			S_TYPE = #{type},
+			</if>
+			<if test='visible != null and visible.equals("Y")'>
+			S_VISIBLE = 'Y'
+			</if>
+			<if test='visible != null and !visible.equals("Y")'>
+			S_VISIBLE = 'N'
+			</if>
+	</insert>
+	
+	<update id="removeBoard" parameterType="string">
+		UPDATE DB_ALLPET.T_BOARD
+		SET S_STATUS = 'N'
+		WHERE S_BID = #{value}
+	</update>
+	
+	<update id="removeBoards" parameterType="string">
+		UPDATE DB_ALLPET.T_BOARD
+		SET S_STATUS = 'N'
+		WHERE S_GROUP = #{value}
+	</update>
+	
+	<select id="getBoardImage" parameterType="string" resultType="hashmap">
+		SELECT
+			B.s_iid,
+			B.s_image_path,
+			B.s_thum_img_path
+		FROM
+			DB_ALLPET.T_BOARD A
+			LEFT OUTER JOIN
+			DB_ALLPET.T_IMAGE B
+			ON A.S_IID = B.S_IID
+		WHERE
+			S_BID = #{value}
+			AND B.S_STATUS = 'Y'
+	</select>
+	
+	<insert id="insertSubinfo" parameterType="string">
+		INSERT INTO DB_ALLPET.T_BOARD_CONTENTS
+		(
+			S_ROWNUMBER,
+			S_BID,
+			S_TYPE,
+			S_SUB_TYPE,
+			S_PROVIDER,
+			S_VALUE,
+			N_INDEX
+		)
+		VALUES
+		${value}
+	</insert>
+	
+	<delete id="deleteSubinfoByType" parameterType="hashmap">
+		DELETE FROM DB_ALLPET.T_BOARD_CONTENTS WHERE S_TYPE = #{type} AND S_BID = #{bid}
+	</delete> 
+	
+</mapper>

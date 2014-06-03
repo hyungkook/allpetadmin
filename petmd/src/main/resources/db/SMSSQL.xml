@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+
+<mapper namespace="SMS">
+	
+	<insert id="insertSmsData" parameterType="hashmap" useGeneratedKeys="true" keyProperty="seqKey">
+		INSERT INTO	DB_ALLPET.SDK_SMS_SEND 
+			( 
+			USER_ID, 
+			SUBJECT, 
+			SMS_MSG, 
+			CALLBACK_URL, 
+			NOW_DATE, 
+			SEND_DATE, 
+			CALLBACK,
+			DEST_INFO,
+			RESERVED1,
+			RESERVED2,
+			RESERVED3,
+			CDR_ID,
+			DEST_COUNT
+			)
+		VALUES 
+			(
+			#{user_id}, 
+			#{subject}, 
+			#{sms_msg}, 
+			#{callback_url}, 
+			DATE_FORMAT(NOW(),'%Y%m%d%H%i%s'), 
+			DATE_FORMAT(NOW(),'%Y%m%d%H%i%s'), 
+			#{callback},
+			#{dest_info},
+			#{reserved1},
+			#{reserved2},
+			#{reserved3},
+			#{cdr_id},
+			#{dest_count}
+			)
+	</insert>
+	
+	<insert id="insertSmsReserve" parameterType="hashmap" useGeneratedKeys="true" keyProperty="seqKey">
+		INSERT INTO	DB_ALLPET.SDK_SMS_SEND 
+			( 
+			USER_ID,
+			SCHEDULE_TYPE,
+			SUBJECT, 
+			SMS_MSG, 
+			CALLBACK_URL, 
+			NOW_DATE, 
+			SEND_DATE, 
+			CALLBACK,
+			DEST_INFO,
+			RESERVED1,
+			RESERVED2,
+			CDR_ID,
+			DEST_COUNT
+			)
+		VALUES 
+			(
+			#{user_id}, 
+			1,
+			#{subject}, 
+			#{sms_msg}, 
+			#{callback_url}, 
+			DATE_FORMAT(NOW(),'%Y%m%d%H%i%s'), 
+			#{reserve_date},
+			#{callback},
+			#{dest_info},
+			#{reserved1},
+			#{reserved2},
+			#{cdr_id},
+			#{dest_count}
+			)
+	</insert>
+	
+	<insert id="insertSmsData_dev" parameterType="hashmap" useGeneratedKeys="true" keyProperty="seqKey">
+		INSERT INTO	DB_ALLPET.SDK_SMS_SEND 
+			(
+			MSG_ID,
+			USER_ID, 
+			SUBJECT, 
+			SMS_MSG, 
+			CALLBACK_URL, 
+			NOW_DATE, 
+			SEND_DATE, 
+			CALLBACK,
+			DEST_INFO,
+			RESERVED1,
+			RESERVED2,
+			RESERVED3,
+			CDR_ID,
+			DEST_COUNT
+			)
+		VALUES 
+			(
+			#{msg_id},
+			#{user_id}, 
+			#{subject}, 
+			#{sms_msg}, 
+			#{callback_url}, 
+			DATE_FORMAT(NOW(),'%Y%m%d%H%i%s'), 
+			DATE_FORMAT(NOW(),'%Y%m%d%H%i%s'), 
+			#{callback},
+			#{dest_info},
+			#{reserved1},
+			#{reserved2},
+			#{reserved3},
+			#{cdr_id},
+			#{dest_count}
+			)
+	</insert>
+	
+	<insert id="insertSmsReserve_dev" parameterType="hashmap" useGeneratedKeys="true" keyProperty="seqKey">
+		INSERT INTO	DB_ALLPET.SDK_SMS_SEND 
+			( 
+			MSG_ID,
+			USER_ID,
+			SCHEDULE_TYPE,
+			SUBJECT, 
+			SMS_MSG, 
+			CALLBACK_URL, 
+			NOW_DATE, 
+			SEND_DATE, 
+			CALLBACK,
+			DEST_INFO,
+			RESERVED1,
+			RESERVED2,
+			CDR_ID,
+			DEST_COUNT
+			)
+		VALUES 
+			(
+			#{msg_id},
+			#{user_id}, 
+			1,
+			#{subject}, 
+			#{sms_msg}, 
+			#{callback_url}, 
+			DATE_FORMAT(NOW(),'%Y%m%d%H%i%s'), 
+			#{reserve_date},
+			#{callback},
+			#{dest_info},
+			#{reserved1},
+			#{reserved2},
+			#{cdr_id},
+			#{dest_count}
+			)
+	</insert>
+	
+	<select id="getSMSByDateKey" parameterType="hashmap" resultType="hashmap">
+		SELECT schedule_type, subject, sms_msg, send_date, dest_info, reserved1, reserved2
+		FROM DB_ALLPET.SDK_SMS_SEND
+		WHERE MSG_ID = #{msg_id} AND SEND_DATE = #{send_date} AND RESERVED2 = #{ssid}
+	</select>
+	
+	<select id="getSMS" parameterType="string" resultType="hashmap">
+		SELECT schedule_type, subject, sms_msg, send_date, dest_info, reserved1, reserved2
+		FROM DB_ALLPET.SDK_SMS_SEND
+		WHERE MSG_ID = ${value}
+	</select>
+	
+	<delete id="deleteSMS" parameterType="string">
+		<if test='value != null and value != "0"'>
+		DELETE FROM DB_ALLPET.SDK_SMS_SEND
+		WHERE MSG_ID = ${value}
+		</if>
+	</delete>
+	
+	<insert id="insertMmsData" parameterType="hashmap">
+		INSERT INTO DB_ALLPET.SDK_MMS_SEND
+			(
+			USER_ID, 
+			SCHEDULE_TYPE, 
+			SUBJECT, 
+			NOW_DATE, 
+			SEND_DATE, 
+			CALLBACK, 
+			DEST_COUNT, 
+			DEST_INFO, 
+			MSG_TYPE, 
+			MMS_MSG , 
+			CONTENT_COUNT, 
+			CONTENT_DATA,
+			RESERVED1,
+			RESERVED2
+			)
+		values
+			(
+			#{user_id}, 
+			#{schedule_type},
+			#{subject}, 
+			DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'), 
+			DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'), 
+			#{callback},
+			#{dest_count},
+			#{dest_info},
+			#{msg_type},
+			#{mms_msg}, 
+			#{content_count},
+			#{content_data},
+			#{reserved1},
+			#{reserved2}
+			)
+	</insert>
+	
+	<insert id="insertSmsDataBatch" parameterType="string">
+		INSERT INTO	DB_ALLPET.SDK_SMS_SEND 
+			( 
+			USER_ID, 
+			SUBJECT, 
+			SMS_MSG, 
+			NOW_DATE, 
+			SEND_DATE, 
+			CALLBACK,
+			DEST_INFO,
+			RESERVED1,
+			RESERVED2,
+			RESERVED3,
+			RESERVED4,
+			CDR_ID,
+			DEST_COUNT
+			)
+		VALUES 
+			${value}
+	</insert>
+	
+	<insert id="insertMmsDataBatch" parameterType="string">
+		INSERT INTO DB_ALLPET.SDK_MMS_SEND
+			(
+			USER_ID, 
+			SCHEDULE_TYPE, 
+			SUBJECT, 
+			NOW_DATE, 
+			SEND_DATE, 
+			CALLBACK, 
+			DEST_COUNT, 
+			DEST_INFO, 
+			MSG_TYPE, 
+			MMS_MSG , 
+			CONTENT_COUNT, 
+			CONTENT_DATA,
+			RESERVED1,
+			RESERVED2,
+			RESERVED3,
+			RESERVED4
+			)
+		values
+			${value}
+	</insert>
+	
+	<select id="getNextMsgId" resultType="string">
+		SELECT MAX(MSG_ID)+1
+		FROM DB_ALLPET.SDK_SMS_SEND
+	</select>
+	<!-- SELECT SUBSTR(S_S_SID, 19, 3)
+FROM T_HOSPITAL_BASIC_INFO
+WHERE S_S_SID
+	<select id="getSMSKey"></select> -->
+	
+</mapper>

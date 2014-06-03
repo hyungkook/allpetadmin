@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+<mapper namespace="Hospital.Staff">
+	
+	<select id="getFirstStaffInfo" parameterType="string" resultType="hashmap">
+		SELECT
+			s_stid,
+			s_sid,
+			s_category,
+			s_name,
+			s_position,
+			n_index,
+			s_state,
+			s_working_time,
+			s_specialty,
+			s_iid,
+			(
+				SELECT
+					s_image_path
+				FROM
+					DB_ALLPET.T_IMAGE
+				WHERE
+					S_IID = A.S_IID
+					AND S_LKEY = 'STFF'
+			) AS image_path
+		FROM
+			DB_ALLPET.T_STAFF_INFO A
+		WHERE
+			S_SID = #{idx}
+			AND N_INDEX = 1
+			AND S_CATEGORY = #{category}
+			<if test="state != null and !state.equals('')">
+			AND S_STATE = 'Y'
+			</if>
+	</select>
+	
+	<select id="getStaffInfo" parameterType="string" resultType="hashmap">
+		SELECT
+			s_stid,
+			s_sid,
+			s_category,
+			s_name,
+			s_position,
+			n_index,
+			s_state,
+			s_working_time,
+			s_specialty,
+			s_iid,
+			(
+				SELECT
+					s_image_path
+				FROM
+					DB_ALLPET.T_IMAGE
+				WHERE
+					S_IID = A.S_IID
+			) AS image_path
+		FROM
+			DB_ALLPET.T_STAFF_INFO A
+		WHERE
+			S_STID = #{value}
+	</select>
+	
+	<select id="getStaffListCnt" parameterType="hashmap" resultType="string">
+		SELECT
+			COUNT(*)
+		FROM
+			DB_ALLPET.T_STAFF_INFO
+		WHERE
+			S_CATEGORY = #{category}
+			AND S_SID = #{idx}
+			<if test="state != null and !state.equals('')">
+			AND S_STATE = 'Y'
+			</if>
+	</select>
+	
+	<select id="getStaffList" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_stid,
+			s_sid,
+			s_category,
+			s_name,
+			s_position,
+			n_index,
+			s_state,
+			s_working_time,
+			s_specialty,
+			s_iid,
+			(
+				SELECT
+					s_image_path
+				FROM
+					DB_ALLPET.T_IMAGE
+				WHERE
+					S_IID = A.S_IID
+			) AS image_path
+		FROM
+			DB_ALLPET.T_STAFF_INFO A
+		WHERE
+			<if test="category != null and !category.equals('')">
+			S_CATEGORY = #{category} AND
+			</if>
+			S_SID = #{idx}
+			<if test="state != null and !state.equals('')">
+			AND S_STATE = 'Y'
+			</if>
+		ORDER BY N_INDEX ASC
+		<if test="startRow != null and !startRow.equals('')">
+		LIMIT ${startRow}, ${endRow}
+		</if>
+	</select>
+	
+	<select id="getStaffPastList" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_stid,
+			s_type,
+			n_index,
+			d_start_date,
+			d_end_date,
+			s_desc
+		FROM
+			DB_ALLPET.T_STAFF_PAST_INFO
+		WHERE
+			S_STID = #{stid}
+			<if test='type != null and !type.equals("")'>
+			AND S_TYPE = #{type}
+			</if>
+	</select>
+	
+</mapper>

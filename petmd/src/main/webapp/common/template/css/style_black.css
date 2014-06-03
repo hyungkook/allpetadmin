@@ -1,0 +1,202 @@
+
+#head{background:#292929;}
+
+.ui-body-c, .ui-overlay-c, .ui-content{background:#f0f0f0;}
+
+#head .ui-btn-up-a { background:none;}
+#head .ui-btn-hover-a { background:#000000;}
+#head .ui-btn-down-a { background:#000000;}
+#head .ui-btn-active { background:#000000;}
+
+#head .t_edit .ui-btn-up-a    { background:#161616; border:solid 1px #000000; box-shadow:0 1px 0 #5c5c5c inset; -webkit-box-shadow:0 1px 0 #5c5c5c inset;}
+#head .t_edit .ui-btn-hover-a { background:#000000; border:solid 1px #000000; box-shadow:0 1px 0 #5c5c5c inset; -webkit-box-shadow:0 1px 0 #5c5c5c inset;}
+#head .t_edit .ui-btn-down-c  { background:#000000; border:solid 1px #000000; box-shadow:0 1px 0 #5c5c5c inset; -webkit-box-shadow:0 1px 0 #5c5c5c inset;}
+#head .t_edit .ui-btn-active  { background:#000000; border:solid 1px #000000; box-shadow:0 1px 0 #5c5c5c inset; -webkit-box-shadow:0 1px 0 #5c5c5c inset;}
+
+#head .t_edit02 .ui-btn-up-a    { background:#161616; border:solid 1px #000000; box-shadow:0 1px 0 #5c5c5c inset; -webkit-box-shadow:0 1px 0 #5c5c5c inset;}
+#head .t_edit02 .ui-btn-hover-a { background:#000000; border:solid 1px #000000; box-shadow:0 1px 0 #5c5c5c inset; -webkit-box-shadow:0 1px 0 #5c5c5c inset;}
+#head .t_edit02 .ui-btn-down-c  { background:#000000; border:solid 1px #000000; box-shadow:0 1px 0 #5c5c5c inset; -webkit-box-shadow:0 1px 0 #5c5c5c inset;}
+#head .t_edit02 .ui-btn-active  { background:#000000; border:solid 1px #000000; box-shadow:0 1px 0 #5c5c5c inset; -webkit-box-shadow:0 1px 0 #5c5c5c inset;}
+
+
+/* --tab 이미지 교체-- */
+.tab .tab_area .ui-btn-up-c   {color:#959c9e;}
+.tab .tab_area .ui-btn-hover-c{color:#1f1f1f;}
+.tab .tab_area .ui-btn-down-c {color:#1f1f1f;}
+.tab .tab_area .ui-btn-active {color:#1f1f1f;}
+
+.tab .tab_area .on .ui-btn-up-c   {background:url(../images/common/tab_bg_black.png) 50% top no-repeat; color:#1f1f1f;  border-bottom:solid 1px #f0f0f0;}
+.tab .tab_area .on .ui-btn-hover-c{background:url(../images/common/tab_bg_black.png) 50% top no-repeat; color:#1f1f1f;  border-bottom:solid 1px #f0f0f0;}
+.tab .tab_area .on .ui-btn-down-c {background:url(../images/common/tab_bg_black.png) 50% top no-repeat; color:#1f1f1f;  border-bottom:solid 1px #f0f0f0;}
+.tab .tab_area .on .ui-btn-active {background:url(../images/common/tab_bg_black.png) 50% top no-repeat; color:#1f1f1f;  border-bottom:solid 1px #f0f0f0;}
+
+.tab02 .ui-btn-up-c   {color:#696969;  background:#e7e7e7; border-right:solid 1px #bbbbbb; border-bottom:solid 1px #bbbbbb; }
+.tab02 .ui-btn-hover-c{color:#696969;  background:#cfcfcf; border-right:solid 1px #bbbbbb; border-bottom:solid 1px #bbbbbb; }
+.tab02 .ui-btn-down-c {color:#696969;  background:#cfcfcf; border-right:solid 1px #bbbbbb; border-bottom:solid 1px #bbbbbb; }
+.tab02 .ui-btn-active {color:#696969;  background:#cfcfcf; border-right:solid 1px #bbbbbb; border-bottom:solid 1px #bbbbbb; }
+
+.tab02 .on .ui-btn-up-c   {color:#696969;  background:#cfcfcf; border-right:solid 1px #bbbbbb; border-bottom:solid 1px #bbbbbb; }
+.tab02 .on .ui-btn-hover-c{color:#696969;  background:#cfcfcf; border-right:solid 1px #bbbbbb; border-bottom:solid 1px #bbbbbb; }
+.tab02 .on .ui-btn-down-c {color:#696969;  background:#cfcfcf; border-right:solid 1px #bbbbbb; border-bottom:solid 1px #bbbbbb; }
+.tab02 .on .ui-btn-active {color:#696969;  background:#cfcfcf; border-right:solid 1px #bbbbbb; border-bottom:solid 1px #bbbbbb; }
+
+/* -- 샵홈 -- */
+.shop_btn_area{ background:#ebebeb;}
+.shop_info h3{ background:#e3e3e3;}
+
+/* -- 서비스상품 -- */
+.search .s_box{border:solid 2px #f64668;}
+.search .s_btn {border-left:solid 1px #e72f53;}
+.search .s_btn .ui-btn-up-c    {background:#f64668; border-left:solid 1px #f76783;}
+.search .s_btn .ui-btn-hover-c {background:#dd3757; border-left:solid 1px #f76783;}
+.search .s_btn .ui-btn-down-c  {background:#dd3757; border-left:solid 1px #f76783;}
+.search .s_btn .ui-btn-active  {background:#dd3757; border-left:solid 1px #f76783;}
+
+/* -- 리뷰 -- */
+.review_top{ 
+	background-image: -moz-linear-gradient(top, #f0f0f0 , #ebebeb);
+	background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, #f0f0f0), color-stop(1, #ebebeb));
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#f0f0f0', EndColorStr='#ebebeb')";
+}
+.review_list .txt02{color:#f64668;}
+.review_list .btn_review .ui-btn-up-c    {color:#f64668;}
+.review_list .btn_review .ui-btn-hover-c {color:#f64668;}
+.review_list .btn_review .ui-btn-down-c  {color:#f64668;}
+.review_list .btn_review .ui-btn-active  {color:#f64668;}
+
+.photo_edit{position:relative; margin:0; padding:10px 8px; font-size:0; line-height:0; text-align:center; border-bottom:solid 1px #e1dedf; border-top:solid 1px #ffffff; background:#e9e9e9;}
+.photo_edit .ui-btn-up-c    {background:none; margin:3px 2px; padding:0; border:solid 3px #ffffff; display:block; box-shadow:1px 1px 2px #c9c6c6; -webkit-box-shadow:1px 1px 2px #c9c6c6;}
+.photo_edit .ui-btn-hover-c {background:none; margin:3px 2px; padding:0; border:solid 3px #f64668; display:block; box-shadow:1px 1px 2px #c9c6c6; -webkit-box-shadow:1px 1px 2px #c9c6c6;}
+.photo_edit .ui-btn-down-c  {background:none; margin:3px 2px; padding:0; border:solid 3px #f64668; display:block; box-shadow:1px 1px 2px #c9c6c6; -webkit-box-shadow:1px 1px 2px #c9c6c6;}
+.photo_edit .ui-btn-active  {background:none; margin:3px 2px; padding:0; border:solid 3px #f64668; display:block; box-shadow:1px 1px 2px #c9c6c6; -webkit-box-shadow:1px 1px 2px #c9c6c6;}
+
+/* -- 마이샵 -- */
+.shop_list .ui-btn-up-c{background:#f0f0f0;}
+.shop_list .ui-btn-down-c{background:#e9e9e9;}
+.shop_list .ui-btn-hover-c{background:#e9e9e9;}
+.shop_list .ui-btn-active{background:#e9e9e9;}
+
+.li_shopList .btn .ui-btn-up-c{ background:#f0f0f0;}
+.li_shopList .btn .ui-btn-hover-c{ background:#e9e9e9;}
+.li_shopList .btn .ui-btn-down-c{ background:#e9e9e9;}
+.li_shopList .btn .ui-btn-active{ background:#e9e9e9;}
+
+.btn_area .ui-btn-up-c{ 
+	background-image: -moz-linear-gradient(top, #696969 , #505050);
+	background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, #696969), color-stop(1, #505050));
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#696969', EndColorStr='#505050')";
+}
+.btn_area .ui-btn-hover-c{ 
+	background-image: -moz-linear-gradient(top, #505050 , #3b3b3b);
+	background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, #505050), color-stop(1, #3b3b3b));
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#505050', EndColorStr='#3b3b3b')";
+}
+.btn_area .ui-btn-down-c{ background-image: -moz-linear-gradient(top, #505050 , #222222);
+	background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, #505050), color-stop(1, #222222));
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#505050', EndColorStr='#222222')";
+}
+.btn_area .ui-btn-active{ background-image: -moz-linear-gradient(top, #505050 , #3b3b3b);
+	background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, #505050), color-stop(1, #3b3b3b));
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#505050', EndColorStr='#3b3b3b')";
+}
+.dim .ui-btn-up-c{ 
+	background-image: -moz-linear-gradient(top, #4f4f4f , #434343);
+	background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, #4f4f4f), color-stop(1, #434343));
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#4f4f4f', EndColorStr='#434343')";
+}
+.dim .ui-btn-hover-c{ 
+	background-image: -moz-linear-gradient(top, #404040 , #303030);
+	background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, #404040), color-stop(1, #303030));
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#404040', EndColorStr='#303030')";
+}
+.dim .ui-btn-down-c{
+	background-image: -moz-linear-gradient(top, #404040 , #303030);
+	background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, #404040), color-stop(1, #303030));
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#404040', EndColorStr='#202020')";
+}
+.dim .ui-btn-active{
+	background-image: -moz-linear-gradient(top, #404040 , #303030);
+	background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, #404040), color-stop(1, #303030));
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#404040', EndColorStr='#303030')";
+}
+
+/* -- 슬라이드 메뉴 컬러 -- */
+.set_list .b_type_on .ui-btn-up-c    { color:#f64668;}
+.set_list .b_type_on .ui-btn-hover-c { color:#f64668;}
+.set_list .b_type_on .ui-btn-down-c  { color:#f64668;}
+.set_list .b_type_on .ui-btn-active  { color:#f64668;}
+
+/* -- 로그인 컬러 -- */
+.login .login_tab ul li.btn01 .ui-btn-up-c    {background:#f64668; border-left:solid 1px #d02747; border-right:solid 1px #d02747; border-top:solid 1px #d02747;}
+.login .login_tab ul li.btn01 .ui-btn-hover-c {background:#dd3757; border-left:solid 1px #d02747; border-right:solid 1px #d02747; border-top:solid 1px #d02747;}
+.login .login_tab ul li.btn01 .ui-btn-down-c  {background:#dd3757; border-left:solid 1px #d02747; border-right:solid 1px #d02747; border-top:solid 1px #d02747;}
+.login .login_tab ul li.btn01 .ui-btn-active  {background:#d83252; border-left:solid 1px #d02747; border-right:solid 1px #d02747; border-top:solid 1px #d02747;}
+
+.login .login_box{border:solid 1px #d02747;}
+.login .login_box .login_btn .ui-btn-up-c   {border:solid 1px #d02747; background:#f64668;}
+.login .login_box .login_btn .ui-btn-hover-c{border:solid 1px #d02747; background:#dd3757;}
+.login .login_box .login_btn .ui-btn-down-c {border:solid 1px #d02747; background:#dd3757;}
+.login .login_box .login_btn .ui-btn-active {border:solid 1px #d02747; background:#dd3757;}
+
+.login .login_txt a {color:#f64668;}
+
+
+
+/* -- 테이블 -- */
+.m_list table th{background:#e7e7e7;}
+.m_list table th.total{background:#e7e7e7;}
+
+.table_type01   {border-top:solid 1px #bbbbbb; border-left:solid 1px #bbbbbb;}
+.table_type01 th{border-right:solid 1px #bbbbbb; border-bottom:solid 1px #bbbbbb; color:#936f6f; background:#e9e0e3;}
+.table_type01 td{border-right:solid 1px #bbbbbb; border-bottom:solid 1px #bbbbbb; border-left:solid 1px #bbbbbb; }
+
+.table_type06 { background:#fafafa;}
+.table_type06 th{background:#e7e7e7;}
+
+.table_type07 { background:#fafafa;}
+.table_type07 th{background:#e7e7e7;}
+
+
+
+/* -- 버튼컬러 변경 -- */
+.btn_phon .ui-btn-up-c    { background:#f64668; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+.btn_phon .ui-btn-hover-c { background:#dd3757; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+.btn_phon .ui-btn-down-c  { background:#dd3757; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+.btn_phon .ui-btn-active  { background:#dd3757; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+
+.btn_type01 .ui-btn-up-c    { background:#e7e7e7; border:solid 1px #bebebe;}
+.btn_type01 .ui-btn-hover-c { background:#dcdcdc; border:solid 1px #bebebe;}
+.btn_type01 .ui-btn-down-c  { background:#dcdcdc; border:solid 1px #bebebe;}
+.btn_type01 .ui-btn-active  { background:#dcdcdc; border:solid 1px #bebebe;}
+
+.btn_type02 .ui-btn-up-c    {background:#f64668; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+.btn_type02 .ui-btn-hover-c {background:#dd3757; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+.btn_type02 .ui-btn-down-c  {background:#dd3757; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+.btn_type02 .ui-btn-active  {background:#dd3757; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+
+.product_list .ui-btn-up-c{background:#f7f3f4; box-shadow:none; -webkit-box-shadow:none; margin:0; padding:0; border:none;}
+.product_list .ui-btn-down-c{background:#ebe8e9; box-shadow:none; -webkit-box-shadow:none; margin:0; padding:0; border:none;}
+.product_list .ui-btn-hover-c{background:#ebe8e9; box-shadow:none; -webkit-box-shadow:none; margin:0; padding:0; border:none;}
+.product_list .ui-btn-active{background:#ebe8e9; box-shadow:none; -webkit-box-shadow:none; margin:0; padding:0; border:none;}
+
+.btn_more .ui-btn-up-c   {background:#e7e7e7; color:#646464;}
+.btn_more .ui-btn-hover-c{background:#dddddd; color:#f64668;}
+.btn_more .ui-btn-down-c {background:#dddddd; color:#f64668;}
+.btn_more .ui-btn-active {background:#dddddd; color:#f64668;}
+
+.btn_more02 .ui-btn-up-c   {background:#e7e7e7; color:#646464;}
+.btn_more02 .ui-btn-hover-c{background:#dddddd; color:#f64668;}
+.btn_more02 .ui-btn-down-c {background:#dddddd; color:#f64668;}
+.btn_more02 .ui-btn-active {background:#dddddd; color:#f64668;}
+
+.btn_admin04 .ui-btn-up-c    { background:#f64668; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+.btn_admin04 .ui-btn-hover-c { background:#dd3757; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+.btn_admin04 .ui-btn-down-c  { background:#dd3757; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+.btn_admin04 .ui-btn-active  { background:#dd3757; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+
+.btn_admin06_red .ui-btn-up-c    { background:#f64668; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+.btn_admin06_red .ui-btn-hover-c { background:#dd3757; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+.btn_admin06_red .ui-btn-down-c  { background:#dd3757; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+.btn_admin06_red .ui-btn-active  { background:#dd3757; border:solid 1px #d02747; box-shadow:0 1px 0 #ffb0bf inset; -webkit-box-shadow:0 1px 0 #ffb0bf inset;}
+
+

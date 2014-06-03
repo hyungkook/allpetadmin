@@ -1,0 +1,22 @@
+
+
+/* 이벤트 테이블 */
+.table_ttl {font-size:16px; color:#fff; background:#f64668; font-weight:bold; text-align:center; padding:8px 0 7px 0; margin:0; border:solid 1px #FFF; line-height:19px;}
+.event_table01 {border-top:solid 1px #bdb9ba; border-left:solid 1px #bdb9ba;}
+.event_table01 th{border-right:solid 1px #bdb9ba; border-bottom:solid 1px #bdb9ba; text-align:center; font-size:12px; line-height:17px; font-weight:bold; color:#936f6f; background:#e9e0e3; padding:7px 0 5px 0;}
+.event_table01 td{border-right:solid 1px #bdb9ba; border-bottom:solid 1px #bdb9ba; border-left:solid 1px #c8d0da; text-align:center; font-size:12px; color:#6c6c6c; background:#ffffff; padding:8px 0; font-weight:bold; line-height:17px;}
+.event_table01 td span{ color:#2489ce;}
+.event_table01 td span.red{ color:#f40000;}
+
+/* 이벤트 테이블 */
+.lotto_ttl{color:#dedede; font-size:16px; line-height:19px; padding:12px 0 11px 0; text-align:center; background:#000000; border-bottom:solid 2px #8d283c;}
+.lotto_ttl span{color:#ff476f; font-weight:bold;}
+
+/* 이벤트 테이블 02*/
+.area20{ margin:0 20px;}
+.table_type01{padding:0; border-left:solid 1px #b7b7b7; border-top:solid 1px #b7b7b7;}
+.table_type01 th{ background:#f0f0f0; color:#555555; border-right:solid 1px #b7b7b7; border-bottom:solid 1px #b7b7b7; padding:6px 0 5px 0; text-align:center; font-size:12px; line-height:17px;}
+.table_type01 th.thbg02 { background:#e6e6e6; color:#000000; font-weight:bold;}
+.table_type01 .red01 { color:#ce1014;}
+.table_type01 .red02 { color:#ce1014; font-size:14px; font-weight:bold;}
+.table_type01 td{ background:#f7f7f7; color:#000000; border-right:solid 1px #b7b7b7; border-bottom:solid 1px #b7b7b7; padding:6px 0 5px 0; text-align:center; font-size:12px; line-height:17px;}

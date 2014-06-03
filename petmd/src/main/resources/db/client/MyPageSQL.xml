@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+<mapper namespace="Client.MyPage">
+
+	<!-- 가입 후 지난 일자 가져오기 -->
+	<select id="getMemberRegTime" resultType="String" parameterType="hashmap">
+		SELECT 	
+			DATEDIFF(NOW() ,S_REG_DATE) value
+		FROM 
+			DB_ALLPET.T_MEMBER
+		WHERE
+			S_UID = #{s_uid} 
+	</select>
+	
+	<!-- 개인 정보 수정 : 지역 정보 변경 -->
+	<update id="updateLocation" parameterType="hashmap">
+		UPDATE DB_ALLPET.T_MEMBER SET
+			S_LOCATION = #{s_location}, 
+			S_DO = #{s_do}, 
+			S_SIGU = #{s_sigu}, 
+			S_DONG = #{s_dong}
+		WHERE s_uid = #{s_uid} 
+	</update>
+
+	<!-- 본인 패스워드 확인 -->
+	<select id="getPasswordCheck" parameterType="hashmap" resultType="String">
+		SELECT
+			count(*)
+		FROM DB_ALLPET.T_MEMBER
+		WHERE s_uid = #{s_uid}
+		  AND s_password = #{s_password}
+	</select>
+	
+	<!-- 비밀번호 변경 -->
+	<update id="updatePassword" parameterType="hashmap">
+		UPDATE DB_ALLPET.T_MEMBER SET
+			s_password = #{new_pw}
+		WHERE s_uid = #{s_uid}
+	</update>
+	
+	<!-- 탈퇴버튼 클릭시 상태 변경 -->
+	<update id="updateDropStatus" parameterType="hashmap">
+		UPDATE DB_ALLPET.T_MEMBER SET
+			s_status = 'OR'
+		WHERE s_uid = #{s_uid}
+		  AND s_password = #{s_password}
+	</update>
+	
+	<!-- 핸드폰 번호 변경 -->
+	<update id="updatePhoneNumber" parameterType="hashmap">
+		UPDATE DB_ALLPET.T_MEMBER SET
+			s_cphone_number = #{s_cphone_number}
+		WHERE s_uid = #{s_uid}
+	</update>
+	
+	<!-- 핸드폰 변경시 기존 핸드폰 번호 변경 및 상태 변경 -->
+	<update id="updateDuplicationPhoneNumber" parameterType="hashmap">
+		UPDATE DB_ALLPET.T_MEMBER SET
+			s_cphone_number = '${s_cphone_number}T',
+			s_status = 'T'
+		WHERE s_cphone_number = #{s_cphone_number}
+	</update>
+	
+	<insert id="insertPetInfo" parameterType="hashmap">
+	INSERT INTO DB_ALLPET.T_PET_INFO
+		(
+			<trim suffixOverrides=",">
+			S_PID,
+			S_UID,
+			S_SPECIES,
+			S_BREED,
+			<if test='gender != null and !gender.equals("")'>
+			S_GENDER,
+			</if>
+			S_PET_NAME,
+			<if test='birthday != null and !birthday.equals("")'>
+			D_BIRTHDAY,
+			</if>
+			<if test='neutralize != null and !neutralize.equals("")'>
+			S_NEUTRALIZE,
+			</if>
+			<if test='reg_number != null and !reg_number.equals("")'>
+			S_REG_NUMBER,
+			</if>
+			</trim>
+		)
+	VALUES
+		(
+			<trim suffixOverrides=",">
+			#{pid},
+			#{uid},
+			<choose>
+				<when test='species.equals("dog")'>'DOG_SPECIES',</when>
+				<when test='species.equals("cat")'>'CAT_SPECIES',</when>
+				<otherwise>#{species},</otherwise>
+			</choose>
+			#{breed},
+			<if test='gender != null and !gender.equals("")'>
+				<choose>
+					<when test='gender.equals("male")'>'M',</when>
+					<when test='gender.equals("female")'>'F',</when>
+					<otherwise>#{gender},</otherwise>
+				</choose>
+			</if>
+			#{pet_name},
+			<if test='birthday != null and !birthday.equals("")'>
+			#{birthday},
+			</if>
+			<if test='neutralize != null and !neutralize.equals("")'>
+				<choose>
+					<when test='neutralize.equals("rsv")'>'R',</when>
+					<when test='neutralize.equals("done")'>'Y',</when>
+					<when test='neutralize.equals("na")'>'N',</when>
+					<otherwise>#{neutralize},</otherwise>
+				</choose>
+			</if>
+			<if test='reg_number != null and !reg_number.equals("")'>
+			#{reg_number},
+			</if>
+			</trim>
+		)
+	ON DUPLICATE KEY UPDATE
+		<if test='uid != null and !uid.equals("")'>
+		S_UID = #{uid},
+		</if>
+		<if test='species != null and !species.equals("")'>
+		S_SPECIES = <choose>
+				<when test='species.equals("dog")'>'DOG_SPECIES',</when>
+				<when test='species.equals("cat")'>'CAT_SPECIES',</when>
+				<otherwise>#{species},</otherwise>
+			</choose>
+		</if>
+		<if test='breed != null and !breed.equals("")'>
+		S_BREED = #{breed},
+		</if>
+		<if test='gender != null and !gender.equals("")'>
+			S_GENDER = <choose>
+				<when test='gender.equals("male")'>'M',</when>
+				<when test='gender.equals("female")'>'F',</when>
+				<otherwise>#{gender},</otherwise>
+			</choose>
+		</if>
+		<if test='pet_name != null and !pet_name.equals("")'>
+		S_PET_NAME = #{pet_name},
+		</if>
+		<if test='birthday != null and !birthday.equals("")'>
+		D_BIRTHDAY = #{birthday},
+		</if>
+		<if test='neutralize != null and !neutralize.equals("")'>
+		S_NEUTRALIZE = <choose>
+					<when test='neutralize.equals("rsv")'>'R',</when>
+					<when test='neutralize.equals("done")'>'Y',</when>
+					<when test='neutralize.equals("na")'>'N',</when>
+					<otherwise>#{neutralize},</otherwise>
+				</choose>
+		</if>
+		<if test='reg_number != null and !reg_number.equals("")'>
+		S_REG_NUMBER = #{reg_number},
+		</if>
+		S_PID = S_PID
+		
+	</insert>
+	
+	<select id="getPetInfoByPID" parameterType="string" resultType="hashmap">
+		SELECT
+			S_PID AS s_pid,
+			S_UID AS s_uid,
+			S_SPECIES AS s_species,
+			S_BREED AS s_breed,
+			S_GENDER AS s_gender,
+			S_PET_NAME AS s_pet_name,
+			D_BIRTHDAY AS d_birthday,
+			S_NEUTRALIZE AS s_neutralize,
+			S_REG_NUMBER AS s_reg_number
+		FROM
+			DB_ALLPET.T_PET_INFO
+		WHERE
+			S_PID = #{value}
+			AND S_STATUS = 'Y'
+	</select>
+	
+	<select id="getPetCntByUID" parameterType="string" resultType="string">
+		SELECT
+			COUNT(*)
+		FROM
+			DB_ALLPET.T_PET_INFO
+		WHERE
+			S_UID = #{value}
+			AND S_STATUS = 'Y'
+	</select>
+	
+	<select id="getPetInfoByUID" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			S_PID AS s_pid,
+			S_UID AS s_uid,
+			(SELECT S_VALUE FROM DB_ALLPET.T_ELEMENT WHERE S_GROUP = 'PET_SPECIES' AND S_KEY = S_SPECIES) AS _species,
+			(SELECT S_VALUE FROM DB_ALLPET.T_ELEMENT WHERE S_GROUP = S_SPECIES AND S_KEY = S_BREED) AS _breed,
+			S_GENDER AS s_gender,
+			S_PET_NAME AS s_pet_name,
+			D_BIRTHDAY AS d_birthday,
+			(UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(D_BIRTHDAY)) AS age_second,
+			S_NEUTRALIZE AS s_neutralize,
+			S_REG_NUMBER AS s_reg_number
+		FROM
+			DB_ALLPET.T_PET_INFO
+		WHERE
+			S_UID = #{uid}
+			AND S_STATUS = 'Y'
+		<if test="startRow != null and !startRow.equals('')">
+		LIMIT ${startRow}, ${endRow}
+		</if>
+	</select>
+	
+	<update id="updatePetStatus" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_PET_INFO
+		SET
+			S_STATUS = #{status}
+		WHERE
+			S_PID = #{pid}
+	</update>
+<!-- 	
+	<select id="getUserPoint" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			*
+		FROM
+			DB_ALLPET.T_HOSPITAL_USER_POINT
+		WHERE
+			D_REG_DATE > FROM_UNIXTIME(UNIX_TIMESTAMP(NOW())-(86400*30*3))
+		ORDER BY D_REG_DATE DESC
+	</select> -->
+	
+	<select id="getUserPointAll" parameterType="string" resultType="hashmap">
+		SELECT
+			UP.sum_pt,
+			BI.s_sid,
+			BI.s_hospital_name
+		FROM
+			(
+				SELECT
+					SUM(N_POINT) AS sum_pt, s_sid
+				FROM
+					DB_ALLPET.T_HOSPITAL_USER_POINT
+				WHERE
+					S_UID = #{value}
+				GROUP BY
+					S_SID
+			) AS UP, DB_ALLPET.T_HOSPITAL_BASIC_INFO BI
+		WHERE
+			UP.s_sid = BI.s_sid
+	</select>
+	
+	<select id="getTotalUserPoint" parameterType="hashmap" resultType="hashmap">
+		SELECT IFNULL((
+			SELECT
+				SUM(N_POINT)
+			FROM
+				DB_ALLPET.T_HOSPITAL_USER_POINT
+			WHERE
+				S_UID = #{uid}
+			GROUP BY
+				S_SID
+			HAVING
+				S_SID = #{sid}
+			),0) AS sum_pt,
+			IFNULL((
+			SELECT
+				COUNT(*) AS cnt
+			FROM
+				DB_ALLPET.T_HOSPITAL_USER_POINT
+			WHERE
+				S_UID = #{uid}
+				<if test='period != null and !period.equals("")'>
+				AND D_REG_DATE > FROM_UNIXTIME(UNIX_TIMESTAMP(NOW())-(86400*${period}))
+				</if>
+			GROUP BY
+				S_SID
+			HAVING
+				S_SID = #{sid}
+			),0) AS cnt
+	</select>
+	
+	<select id="getUserPoint" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			N_POINT AS n_point,
+			S_UID AS s_uid,
+			S_SID AS s_sid,
+			S_TYPE AS s_type,
+			S_DESC AS s_desc,
+			D_REG_DATE AS d_reg_date
+		FROM
+			DB_ALLPET.T_HOSPITAL_USER_POINT
+		WHERE
+			S_UID = #{uid}
+			AND S_SID = #{sid}
+			<if test='period != null and !period.equals("")'>
+			AND D_REG_DATE > FROM_UNIXTIME(UNIX_TIMESTAMP(NOW())-(86400*${period}))
+			</if>
+		ORDER BY d_reg_date DESC
+		<if test='startRow != null and !startRow.equals("")'>
+		LIMIT ${startRow},${endRow}
+		</if>
+	</select>
+	
+</mapper>

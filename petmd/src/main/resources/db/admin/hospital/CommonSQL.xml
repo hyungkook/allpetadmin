@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+
+<mapper namespace="Admin.Hospital.Common">
+
+	<select id="getInfoWithLogin" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			A.S_HOSPITAL_NAME AS s_hospital_name,
+			A.S_SID AS s_sid,
+			A.S_S_SID AS s_s_sid,
+			B.s_tel
+		FROM
+			DB_ALLPET.T_HOSPITAL_BASIC_INFO A,
+			DB_ALLPET.T_HOSPITAL_MORE_INFO B
+		WHERE
+			S_HOSPITAL_ID = #{id}
+			AND S_HOSPITAL_PW = #{pw}
+			AND A.S_SID = B.S_SID
+	</select>
+	
+	<select id="getInfoWithPw" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			S_HOSPITAL_NAME AS s_hospital_name,
+			S_SID AS s_sid
+		FROM
+			DB_ALLPET.T_HOSPITAL_BASIC_INFO
+		WHERE
+			S_SID = #{sid}
+			AND S_HOSPITAL_PW = #{pw}
+	</select>
+	
+	<update id="updatePassword" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_HOSPITAL_BASIC_INFO
+		SET
+			S_HOSPITAL_PW = #{pw}
+		WHERE
+			S_SID = #{sid}
+	</update>
+	
+	<select id="getNextImageIndex" parameterType="hashmap" resultType="string">
+		SELECT
+			IFNULL(MAX(N_INDEX)+1,0)
+		FROM
+			DB_ALLPET.T_IMAGE
+		WHERE
+			S_SID = #{id}
+			<if test='lkey != null and !lkey.equals("")'>
+			AND S_LKEY = #{lkey}
+			</if>
+			<if test='mkey != null and !mkey.equals("")'>
+			AND S_MKEY = #{mkey}
+			</if>
+			<if test='skey != null and !skey.equals("")'>
+			AND S_SKEY = #{skey}
+			</if>
+	</select>
+	
+	<insert id="insertImage" parameterType="hashmap">
+		INSERT INTO DB_ALLPET.T_IMAGE(
+			S_IID,
+			S_SID,
+			<if test='lkey != null and !lkey.equals("")'>
+			S_LKEY,
+			</if>
+			<if test='mkey != null and !mkey.equals("")'>
+			S_MKEY,
+			</if>
+			<if test='skey != null and !skey.equals("")'>
+			S_SKEY,
+			</if>
+			S_TYPE,
+			S_IMAGE_NAME,
+			S_IMAGE_PATH,
+			<if test='thum_img_path != null and !thum_img_path.equals("")'>
+			S_THUM_IMG_PATH,
+			</if>
+			N_INDEX,
+			<if test='width != null and !width.equals("")'>
+			S_WIDTH,
+			</if>
+			<if test='height != null and !height.equals("")'>
+			S_HEIGHT,
+			</if>
+			S_STATUS,
+			D_REG_DATE
+		)
+		VALUES
+		(
+			#{iid},
+			#{id},
+			<if test='lkey != null and !lkey.equals("")'>
+			#{lkey},
+			</if>
+			<if test='mkey != null and !mkey.equals("")'>
+			#{mkey},
+			</if>
+			<if test='skey != null and !skey.equals("")'>
+			#{skey},
+			</if>
+			#{type},
+			#{image_name},
+			#{image_path},
+			<if test='thum_img_path != null and !thum_img_path.equals("")'>
+			#{thum_img_path},
+			</if>
+			#{index},
+			<if test='width != null and !width.equals("")'>
+			#{width},
+			</if>
+			<if test='height != null and !height.equals("")'>
+			#{height},
+			</if>
+			'Y',
+			NOW()
+		)
+		ON DUPLICATE KEY UPDATE
+			<if test='lkey != null and !lkey.equals("")'>
+			S_LKEY = #{lkey},
+			</if>
+			<if test='mkey != null and !mkey.equals("")'>
+			S_MKEY = #{mkey},
+			</if>
+			<if test='skey != null and !skey.equals("")'>
+			S_SKEY = #{skey},
+			</if>
+			S_TYPE = #{type},
+			S_IMAGE_NAME = #{image_name},
+			S_IMAGE_PATH = #{image_path},
+			<if test='thum_img_path != null and !thum_img_path.equals("")'>
+			S_THUM_IMG_PATH = #{thum_img_path},
+			</if>
+			N_INDEX = #{index},
+			<if test='width != null and !width.equals("")'>
+			S_WIDTH = #{width},
+			</if>
+			<if test='height != null and !height.equals("")'>
+			S_HEIGHT = #{height},
+			</if>
+			D_REG_DATE = NOW()
+			
+	</insert>
+	
+	<select id="getImage" parameterType="string" resultType="hashmap">
+		SELECT
+			s_iid,
+			s_sid,
+			s_lkey,
+			s_mkey,
+			s_skey,
+			s_type,
+			s_image_name,
+			s_image_path,
+			s_thum_img_path,
+			n_index,
+			s_width,
+			s_height,
+			s_status,
+			d_reg_date
+		FROM
+			DB_ALLPET.T_IMAGE
+		WHERE
+			S_IID = #{value};
+	</select>
+	
+	<delete id="deleteImage" parameterType="string">
+		DELETE FROM DB_ALLPET.T_IMAGE WHERE S_IID = #{value}
+	</delete>
+	
+	<delete id="deleteImageByKeys" parameterType="string">
+		DELETE FROM DB_ALLPET.T_IMAGE WHERE S_IID IN ${value}
+	</delete>
+	
+	<update id="updateImageIndex" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_IMAGE
+		SET
+			N_INDEX = #{index}
+		WHERE
+			S_IID = #{iid}
+	</update>
+	
+	<update id="updateImage" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_IMAGE
+		SET
+			<if test='lkey != null and !lkey.equals("")'>
+			S_LKEY = #{lkey},
+			</if>
+			<if test='mkey != null and !mkey.equals("")'>
+			S_MKEY = #{mkey},
+			</if>
+			<if test='skey != null and !skey.equals("")'>
+			S_SKEY = #{skey},
+			</if>
+			<if test='image_name != null and !image_name.equals("")'>
+			S_IMAGE_NAME = #{image_name},
+			</if>
+			<if test='image_path != null and !image_path.equals("")'>
+			S_IMAGE_PATH = #{image_path},
+			</if>
+			<if test='thum_img_path != null and !thum_img_path.equals("")'>
+			S_THUM_IMG_PATH = #{thum_img_path},
+			</if>
+			<if test='index != null and !index.equals("")'>
+			N_INDEX = #{index},
+			</if>
+			<if test='width != null and !width.equals("")'>
+			S_WIDTH = #{width},
+			</if>
+			<if test='height != null and !height.equals("")'>
+			S_HEIGHT = #{height},
+			</if>
+			<if test='(image_name != null and !image_name.equals("")) or (image_path != null and !image_path.equals(""))'>
+			D_REG_DATE = NOW(),
+			</if>
+			S_IID = S_IID
+		WHERE
+			S_IID = #{iid}
+	</update>
+	
+	<update id="full" parameterType="string">
+		${value}
+	</update>
+	
+	<select id="getTempImages" resultType="hashmap" parameterType="string">
+		SELECT
+			s_iid,
+			s_image_path,
+			s_thum_img_path
+		FROM
+			DB_ALLPET.T_IMAGE
+		WHERE
+			S_LKEY = 'TMP'
+			AND D_REG_DATE <![CDATA[<]]> DATE_SUB(NOW(), INTERVAL ${value} SECOND) 
+	</select>
+	
+</mapper>

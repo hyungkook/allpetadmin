@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+
+<mapper namespace="Admin.Total">
+	
+	<select id="getAdminTeamList" resultType="hashmap">
+		SELECT
+			s_team
+		FROM DB_ALLPET.T_ADMINISTRATOR
+		GROUP BY S_TEAM
+	</select>
+	
+	<select id="getAdminList" resultType="hashmap" parameterType="string">
+		SELECT
+			s_aid,
+			s_name,
+			s_team
+		FROM DB_ALLPET.T_ADMINISTRATOR
+		<if test='value != null and value != ""'>
+		WHERE s_team = #{value}
+		</if>
+	</select>
+	
+	<select id="getAdmin" resultType="hashmap" parameterType="string">
+		SELECT
+			s_aid,
+			s_name,
+			s_team
+		FROM DB_ALLPET.T_ADMINISTRATOR
+		<if test='value != null and value != ""'>
+		WHERE s_aid = #{value}
+		</if>
+	</select>
+	
+</mapper>

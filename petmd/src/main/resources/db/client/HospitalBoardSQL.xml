@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd"> 
+
+<mapper namespace="Hospital.Board">
+
+	<select id="getBoardMenu" parameterType="string" resultType="hashmap">
+		SELECT
+			s_cmid,
+			s_parent,
+			s_value,
+			s_status
+		FROM
+			DB_ALLPET.T_CUSTOMIZE
+		WHERE
+			S_ID = #{value}
+			AND S_PARENT = 'MENU4'
+			AND N_LV = 1
+			AND S_STATUS = 'Y'
+		ORDER BY
+			N_INDEX ASC
+	</select>
+	
+	<select id="getBoardListCnt" parameterType="hashmap" resultType="string">
+		SELECT
+			COUNT(*)
+		FROM
+			(
+				SELECT
+					S_SUBJECT,
+					S_CONTENTS
+				FROM
+					DB_ALLPET.T_BOARD A
+				WHERE
+					S_GROUP = #{cmid}
+					<if test="type != null and !type.equals('')">
+					AND S_TYPE = #{type}
+					</if>
+				AND S_STATUS = 'Y'
+				<if test="visible != null and !visible.equals('')">
+				AND S_VISIBLE = #{visible}
+				</if>
+			) B
+		<if test="search_type != null and search_type.equals('subjectcontents')">
+			<if test="search_text != null and !search_text.equals('')">
+				WHERE
+				(S_SUBJECT LIKE #{search_text} OR S_CONTENTS LIKE #{search_text})
+			</if>
+		</if>
+	</select>
+	
+	<select id="getBoardList" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_bid,
+			s_subject,
+			s_contents,
+			s_type,
+			s_iid,
+			d_reg_date,
+			thum_img_path
+		FROM
+			(
+				SELECT
+					s_bid,
+					s_parent,
+					s_subject,
+					s_contents,
+					s_type,
+					s_iid,
+					(
+						SELECT
+							s_thum_img_path
+						FROM
+							DB_ALLPET.T_IMAGE
+						WHERE
+							S_IID = A.S_IID
+					) AS thum_img_path,
+					D_UPDATE_DATE,
+					D_REG_DATE,
+					s_visible
+				FROM
+					DB_ALLPET.T_BOARD A
+				WHERE
+					S_GROUP = #{cmid}
+					<if test="type != null and !type.equals('')">
+					AND S_TYPE = #{type}
+					</if>
+				AND S_STATUS = 'Y'
+				<if test="visible != null and !visible.equals('')">
+				AND S_VISIBLE = #{visible}
+				</if>
+			) B
+		
+		<if test="search_type != null and search_type.equals('subjectcontents')">
+			<if test="search_text != null and !search_text.equals('')">
+				WHERE
+				(S_SUBJECT LIKE '%${search_text}%' OR S_CONTENTS LIKE '%${search_text}%')
+			</if>
+		</if>
+		ORDER BY D_REG_DATE DESC, D_UPDATE_DATE DESC
+		<if test="startRow != null and !startRow.equals('')">
+		LIMIT ${startRow}, ${endRow}
+		</if>
+	</select>
+	
+	<select id="getServiceBoardList" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			*
+		FROM
+			(
+				SELECT
+					s_bid,
+					s_parent,
+					s_subject,
+					s_contents,
+					s_iid,
+					N_INDEX,
+					(
+						SELECT
+							s_image_path
+						FROM
+							DB_ALLPET.T_IMAGE
+						WHERE
+							S_IID = A.S_IID
+					) AS image_path,
+					D_UPDATE_DATE,
+					D_REG_DATE,
+					s_visible
+				FROM
+					DB_ALLPET.T_BOARD A
+				WHERE
+					S_GROUP = #{cmid}
+					<if test="type != null and !type.equals('')">
+					AND S_TYPE = #{type}
+					</if>
+					AND S_STATUS = 'Y'
+					<if test="visible != null and !visible.equals('')">
+					AND S_VISIBLE = #{visible}
+					</if>
+			) B
+		
+		<if test="search_type != null and search_type.equals('subjectcontents')">
+			<if test="search_text != null and !search_text.equals('')">
+				WHERE
+				(S_SUBJECT LIKE #{search_text} OR S_CONTENTS LIKE #{search_text})
+			</if>
+		</if>
+		ORDER BY N_INDEX ASC
+		<if test="startRow != null and !startRow.equals('')">
+		LIMIT ${startRow}, ${endRow}
+		</if>
+	</select>
+	
+	<select id="getBoard" parameterType="string" resultType="hashmap">
+		SELECT
+			s_bid,
+			s_group,
+			s_parent,
+			s_subject,
+			s_contents,
+			s_type,
+			s_status,
+			s_url,
+			n_read,
+			d_reg_date,
+			s_reg_user,
+			d_update_date,
+			s_update_user,
+			s_iid,
+			(
+				SELECT
+					s_image_path
+				FROM
+					DB_ALLPET.T_IMAGE
+				WHERE
+					S_IID = A.S_IID
+			) AS image_path,
+			s_visible,
+			n_index
+		FROM
+			DB_ALLPET.T_BOARD A
+		WHERE
+			S_BID = #{value}
+			AND S_STATUS = 'Y'
+	</select>
+	
+	<select id="getContentsByBid" parameterType="string" resultType="hashmap">
+		SELECT
+			s_rownumber,
+			s_bid,
+			s_type,
+			s_sub_type,
+			s_provider,
+			s_value,
+			n_index
+		FROM
+			DB_ALLPET.T_BOARD_CONTENTS
+		WHERE
+			S_BID = #{value}
+		ORDER BY N_INDEX
+	</select>
+	
+	<select id="getContentsInBid" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			s_rownumber,
+			s_bid,
+			s_type,
+			s_sub_type,
+			s_provider,
+			s_value,
+			n_index
+		FROM
+			DB_ALLPET.T_BOARD_CONTENTS
+		WHERE
+			S_BID IN
+			<foreach collection="list" item="it" open="(" separator="," close=")">#{it.s_bid}</foreach>
+			AND
+			S_TYPE = #{type}
+		ORDER BY N_INDEX
+	</select>
+	
+	<select id="getAllImportantList" parameterType="hashmap" resultType="hashmap">
+		SELECT
+			*
+		FROM
+			(
+				SELECT
+					B.s_bid,
+					B.s_subject,
+					B.s_contents,
+					B.s_type,
+					B.s_iid,
+					B.s_group,
+					(
+						SELECT
+							s_thum_img_path
+						FROM
+							DB_ALLPET.T_IMAGE
+						WHERE
+							S_IID = B.S_IID
+					) AS thum_img_path,
+					B.d_update_date,
+					B.d_reg_date,
+					DATEDIFF(NOW(), B.d_reg_date) reg_date_diff
+				FROM
+					(
+						SELECT
+							*
+						FROM
+							DB_ALLPET.T_CUSTOMIZE
+						WHERE
+							S_ID = #{sid}
+							AND S_STATUS = 'Y'
+					) C, DB_ALLPET.T_BOARD B
+				WHERE
+					C.S_CMID = B.S_GROUP
+					<if test="type != null and !type.equals('')">
+					AND B.S_TYPE = #{type}
+					</if>
+					AND B.S_STATUS = 'Y'
+					<if test="visible != null and !visible.equals('')">
+					AND B.S_VISIBLE = #{visible}
+					</if>
+			) C
+		ORDER BY D_REG_DATE DESC, D_UPDATE_DATE DESC
+		<if test="startRow != null and !startRow.equals('')">
+		LIMIT ${startRow}, ${endRow}
+		</if>
+	</select>
+	
+</mapper>
