@@ -8,5 +8,5 @@
             <a href="#">공지사항</a>
             <a href="#">실시간 현황</a> -->
         </div>
-        <div class="copy">Copyright ⓒ AD Ventures Inc. All rights Reserved.</div>
+        <div class="copy">Copyright ⓒ ALLPET Inc. All rights Reserved.</div>
     </div>

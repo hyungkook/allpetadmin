@@ -8,7 +8,7 @@
 	
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9" />
 	
-	<title>BeautyLatte Total Admin</title>
+	<title>병원관리 통합 관리자</title>
 	
 	<link rel="stylesheet" href="${con.CSSPATH}/admin.css" type="text/css"/>
 	<link rel="stylesheet" href="${con.CSSPATH}/total.css" type="text/css"/>

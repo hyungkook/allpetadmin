@@ -118,13 +118,13 @@
                 <div class="btn"><a href="#" class="btn_login" onclick="formSubmit()">관리자 로그인</a></div>
             </div>
             <p class="login_txt mt30">* 관리자 계정 정보를 입력해 주시고 관련 정보는 유출되지 않도록 보안사항을 지켜주세요.</p>
-            <p class="login_txt">* 아이디 / 패스워드 분실 시 메디라떼 담당자에게 문의 해 주세요.</p>
+            <p class="login_txt">* 아이디 / 패스워드 분실 시 담당자에게 문의 해 주세요.</p>
             
             <div class="warn">
             	<dl>
                 	<dt>※ 경고</dt>
                     <dd>
-                        1. 본 사이트는 BeautyLatte 서비스를 통합관리하는 사이트로써 관련자가 아닌 사람은 사용하실 수 없습니다.<br /><br />
+                        1. 본 사이트는 ALLPET 서비스를 통합관리하는 사이트로써 관련자가 아닌 사람은 사용하실 수 없습니다.<br /><br />
                         2. 관계자가 아닌 사람이 부정 사용 시 법적 제제 및 민형사 상의 처벌을 받을 수 있음을 알립니다.
                     </dd>
                 </dl>
@@ -139,7 +139,7 @@
         	<!-- <a href="#" class="frist">이용약관</a>
             <a href="#">개인정보 취급방침</a> -->
         </div>
-        <div class="copy">Copyright ⓒ AD Ventures Inc. All rights Reserved.</div>
+        <div class="copy">Copyright ⓒ ALLPET Inc. All rights Reserved.</div>
     </div>
     <!-- /footer end -------------------------------------------------------------------->
    
