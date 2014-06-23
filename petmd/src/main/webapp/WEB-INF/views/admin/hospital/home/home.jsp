@@ -86,132 +86,17 @@ pageContext.setAttribute("cr", "\r");
 		}
 		$("#paging_img_" + (index + 1)).attr("src","${con.IMGPATH}/common/paging_on${personalLayout}.png");
 	}
-	
-	/* var lastIndex = 1;
-	
-		$(parent.document).attr('title','${hospitalInfo.s_hospital_name}');
-	
-	$(document).ready(function(){
 		
-		var agent = isUA();
-
-		if (agent == 'A' || agent == 'I' || agent == 'ETC') {
-			// 위치 정보 가져오기 (어플이 아닌 경우)
-			//getLocation();
-		}
-		
-		$("#touchSlider").touchSlider({
-			flexible : true,
-			btn_prev : $("#aprev"),//.next().find(".btn_prev"),
-			btn_next : $("#anext"),//.next().find(".btn_next"),
-			counter : function (e) {
-				pageDotChange(e.current-1);
-				lastIndex = e.current;
-				$("#count").html("current : " + e.current + ", total : " + e.total);
-			}
+	function noticeRoll(){
+		var $t = $('#ticker_notice li:first'); 
+		$t.attr('data-margin-top',$t.css('margin-top'));
+		$t.animate({
+			'margin-top':-$t.height()+"px"
+		},800,function () {
+			$(this).css('margin-top',$(this).attr('data-margin-top'));
+			$(this).appendTo($('#ticker_notice'));
 		});
-		
-		
-		//$('#touchSlider ul').height($('#touchSlider ul li img').height());
-	});
-	
-	onload=function(){
-		//alert($('#touchSlider ul li img')[0].offsetHeight);
-		$('#touchSlider ul').height($('#touchSlider ul li img').height());
-	}; */
-	
-		/* $('#home').live('pageshow',function(){
-			  
-		  	window.slider = new Swipe(document.getElementById('slider'), {
-				startSlide: 0,
-				speed: 400,
-				//auto: 3000,
-				continuous: true,
-				disableScroll: false,
-				callback: function(index, elem) {
-					$('#step_info_cnt').empty().html(index + 1);
-				},
-		 		transitionEnd: function(index, elem) {
-		 			
-		 		}
-	
-			});
-		  	
-		  	$("#paging_img_1").attr("src","${con.IMGPATH_OLD}/btn/btn_paging_on${personalLayout}.png");
-		  	window.slider_i = new Swipe(document.getElementById('slider_i'), {
-				startSlide: 0,
-				speed: 400,
-				//auto: 3000,
-				continuous: true,
-				disableScroll: false,
-				callback: function(index, elem) {
-					pageDotChange(index);
-			    },
-		 		transitionEnd: function(index, elem) {
-		 			
-		 		}
-	
-			});
-	
-		}); */
-	
-		/* function goMove(type, move) {
-			if  (type == 'person') {
-				if (move == 'prev') {
-					window.slider.prev();
-				} else if((move == 'next')) { 
-					window.slider.next();
-				}
-			}
-			
-			if  (type == 'interior') {
-				if (move == 'prev') {
-					window.slider_i.prev();
-				} else if((move == 'next')) { 
-					window.slider_i.next();
-				}
-			}
-			
-		}
-		
-		function goPageChange(index){
-			
-			var c = index - lastIndex;
-			if(c > 0){
-				for(var i = 0; i < c; i++){
-					$("#anext").click();
-				}
-			}
-			if(c < 0){
-				for(var i = 0; i < -c; i++){
-					$("#aprev").click();
-				}
-			}
-			//window.slider_i.slide(index - 1, 400);
-		
-		}
-		
-		function pageDotChange(index) {
-			for (var i=0; i<=parseInt('${fn:length(introImageList)}'); i++){
-				$("#paging_img_" + i).attr("src","${con.IMGPATH_OLD}/btn/btn_paging_off.png");
-			}
-			$("#paging_img_" + (index + 1)).attr("src","${con.IMGPATH_OLD}/btn/btn_paging_on${personalLayout}.png");
-		}
-		
-		function sendSMS(phone,msg){
-			location.href="sms:"+phone+";01024781727?body="+encodeURIComponent(msg);
-		} */
-		
-		function noticeRoll(){
-			var $t = $('#ticker_notice li:first'); 
-			$t.attr('data-margin-top',$t.css('margin-top'));
-			$t.animate({
-				'margin-top':-$t.height()+"px"
-			},800,function () {
-				$(this).css('margin-top',$(this).attr('data-margin-top'));
-				$(this).appendTo($('#ticker_notice'));
-			});
-		}
+	}
 				
 	</script>
 
@@ -230,10 +115,13 @@ pageContext.setAttribute("cr", "\r");
 					<%--
 					<p class="img_area"><span><img src="<c:choose><c:when test="${empty logo_img.s_image_path}">${con.IMGPATH}/common/default_logo.jpg</c:when><c:otherwise>${con.img_dns}${logo_img.s_image_path}</c:otherwise></c:choose>" width="79px" height="79px"/></span></p>
 					 --%>
-					 <c:if test="${!empty logo_img.s_image_path}">
-					<p class="img_area"><span><img src="${con.img_dns}${logo_img.s_image_path}" width="79px" height="79px"/></span></p>
-					</c:if>
-					<p class="txt01">${hospitalInfo.s_hospital_name}</p>
+					 <c:choose>
+					 <c:when test="${!empty logo_img.s_image_path}">
+						<p class="img_area"><span><img src="${con.img_dns}${logo_img.s_image_path}" width="79px" height="79px"/></span></p>
+						<p class="txt01">${hospitalInfo.s_hospital_name}</p>
+					</c:when>
+					<c:otherwise><p class="txt01" style="margin-top: 130px;">${hospitalInfo.s_hospital_name}</p></c:otherwise>
+					</c:choose>
 				</div>
 				<p class="my_info"><a onclick="goPage('manageHome.latte');" data-role="button"><img src="${con.IMGPATH_OLD}/btn/icon_set_t.png" alt="" width="15" height="15"/><label>설정</label></a></p>
 				<div class="btn_call">
@@ -245,41 +133,8 @@ pageContext.setAttribute("cr", "\r");
 				<div style="position:absolute; top:0; left:0;">
 					<a onclick="goPage('logout.latte');" data-role="button" style="background:transparent;">로그아웃</a>
 				</div>
-				
-				<%-- <div class="logo_area">
-		
-		<p class="txt01">${hospitalInfo.s_hospital_name}</p>
-	</div>
-	<p class="my_info"><a onclick="goPage('myPageHome.latte');" data-role="button"><img src="${con.IMGPATH}/btn/btn_man.png" alt="" width="13" height="14"/><label><c:choose><c:when test="${params.isLogin eq 'Y'}">내정보</c:when><c:otherwise>로그인</c:otherwise></c:choose></label></a></p>
-	<div class="btn_call">
-		<p class="btn01"><a onclick="<c:if test="${empty hospitalInfo.s_sns_id}">alert('등록된 카카오톡 아이디가 없습니다.');</c:if><c:if test="${not empty hospitalInfo.s_sns_id}">alert('카카오톡 아이디 ${hospitalInfo.s_sns_id}');</c:if>" data-role="button"><img src="${con.IMGPATH}/btn/btn_kakao.png" alt="kakao talk" width="51" height="51"/></a></p>
-		<c:if test="${hospitalInfo.SNS_ID_status eq 'Y'}">
-		<p class="btn01"><a data-role="button" onclick="openKakao();"><img src="${con.IMGPATH}/btn/btn_kakao.png" alt="kakao talk" width="51" height="51"/></a></p>
-		</c:if>
-		<p class="btn02 mt04"><a onclick="main_header_phone();" data-role="button"><img src="${con.IMGPATH}/btn/btn_phon.png" alt="전화" width="51" height="51"/></a></p>
-	</div>
-	<p class="bg_img"><img src="<c:choose><c:when test="${empty header_img.s_image_path}">${con.IMGPATH}/common/default_header.jpg</c:when><c:otherwise>${con.img_dns}${header_img.s_image_path}</c:otherwise></c:choose>" width="100%"/></p> --%>
 			</div>
 			
-			
-			<!-- // 상단 이미지 영역 끝-->
-		<%-- 
-			<div style="position:relative;">
-				<img src="${con.img_dns}${header_img.s_image_path}" width="100%"/>
-				<div style="position:absolute; top:50%; left:50%;">
-					<div style="margin-top:-30%; margin-left:-100%; text-align:center;">
-					<img id="hospital_logo" src="${con.img_dns}${logo_img.s_image_path}" width="64px" style="display:inline-block;"/>
-					<p style="text-align:center; font-size:24px; background:white;">${hospitalInfo.s_hospital_name}</p>
-					</div>
-				</div>
-				<div style="position:absolute; top:0; right:0;">
-					<a onclick="goPage('manageHome.latte');" data-role="button" style="background:transparent;"><img src="${con.IMGPATH_OLD}/btn/btn_menu.png" alt="shop" width="60" height="60" />&nbsp;</a>
-				</div>
-				<div style="position:absolute; top:0; left:0;">
-					<a onclick="goPage('logout.latte');" data-role="button" style="background:transparent;">로그아웃</a>
-				</div>
-			</div>
-			 --%>
 			<!-- 메인메뉴 tab -->
 			<jsp:include page="../include/main_menu.jsp"/>
 			
@@ -353,6 +208,7 @@ pageContext.setAttribute("cr", "\r");
 				<%-- 이미지 1장 --%>
 				<c:otherwise>
 					<div class="photo_area">
+						<p class="p_btn_modify"><a onclick="goPage('introduceImgEdit.latte')" data-role="button"><img src="${con.IMGPATH}/btn/icon_modify02.png" alt="" width="19" height="21" /></a></p>
 						<div class="img_area">
 							<ul><li><img src="${con.img_dns}${introImageList[0].s_image_path}" width="100%" /></li></ul>
 						</div>

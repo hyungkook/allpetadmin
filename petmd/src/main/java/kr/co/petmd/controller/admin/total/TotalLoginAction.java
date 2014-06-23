@@ -42,10 +42,6 @@ public class TotalLoginAction {
 							@RequestParam Map<String, String> params, 
 							@RequestParam(required=false) String msg	) {
 	
-//		model.addAttribute("msg", Common.fromKorean(msg));
-//		model.addAttribute("rePage", Common.isNull(params.get("rePage")));
-//		model.addAttribute("type", Common.isNull(params.get("type")));
-		
 		return "admin/total/login/login";
 	}
 	

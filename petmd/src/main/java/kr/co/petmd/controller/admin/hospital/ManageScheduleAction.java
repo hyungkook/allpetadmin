@@ -22,8 +22,6 @@ import kr.co.petmd.utils.common.Common;
 import kr.co.petmd.utils.common.JSONSimpleBuilder;
 import kr.co.petmd.utils.common.JSONUtil;
 import kr.co.petmd.utils.common.PageUtil;
-import kr.co.petmd.utils.common.SMSSender;
-import kr.co.petmd.utils.common.SMSUtil;
 import kr.co.petmd.utils.common.SimpleDateFormatter;
 
 import org.slf4j.Logger;
@@ -61,7 +59,6 @@ public class ManageScheduleAction extends AbstractAction{
 
 	@RequestMapping(value = "/manageSchedule.latte")
 	public String manageSchedule(Model model, HttpServletRequest request, @RequestParam Map<String, String> params) {
-		//logger.info("manageSchedule.latte");
 		
 		SessionContext sessionContext = getSessionContext();
 		
@@ -77,12 +74,6 @@ public class ManageScheduleAction extends AbstractAction{
 			params.put("view_type", "month");
 			params.put("date", (new SimpleDateFormat("yyyy-MM")).format(Calendar.getInstance().getTime()));
 		}
-
-		//params.put("totalCount", SqlDao.getString("Admin.Hospital.Schedule.getListCnt", params));
-		//PageUtil.getInstance().pageSetting(params, 10);
-		//List userTodoList = SqlDao.getList("Admin.Hospital.Schedule.getGroupList", params);
-		//List userTodoList = SqlDao.getList("Admin.Hospital.Schedule.getList", params);
-		//model.addAttribute("userTodoList", userTodoList);
 		
 		Calendar c = Calendar.getInstance();
 		
@@ -95,6 +86,190 @@ public class ManageScheduleAction extends AbstractAction{
 		model.addAttribute("params", params);
 		
 		return "admin/hospital/manage/manage_schedule";
+	}
+	
+	@RequestMapping(value="/createScheduleByAdmin.latte")
+	public @ResponseBody String createScheduleByAdmin(Model model, HttpServletRequest request, @RequestParam HashMap<String, String> params){
+		
+		SessionContext sessionContext = (SessionContext) sessionContextFactory.getObject();
+		
+		JSONSimpleBuilder builder = new JSONSimpleBuilder();
+		
+		if(!sessionContext.isAuth())
+			return builder.add("result", Codes.ERROR_UNAUTHORIZED).build();
+		
+		// 유저 uid 리스트
+		String[] ids = Common.isValid(params.get("uid"))?params.get("uid").split(";"):null;
+		String comment = params.get("comment");
+		String[] userAlert = Common.isValid(params.get("userAlert"))?params.get("userAlert").split(";"):null;
+		
+		int len = 0;
+		
+		String sgid = Common.makeRownumber("sgid", System.currentTimeMillis()*123+"");
+		
+		if(ids!=null){
+			len = ids.length;
+			
+			Calendar c = Calendar.getInstance ( );
+			c.set(Common.toInt(params.get("year")), Common.toInt(params.get("month"))-1, Common.toInt(params.get("day")),
+					Common.toInt(params.get("hour")), Common.toInt(params.get("minute")), 0);
+			
+			// push 입력 시작
+			int maxIdx = SqlDao.getInt("Admin.Push.Schedule.getMaxIdx", new HashMap());
+			if( maxIdx < 1){
+				maxIdx = 0;
+			}
+			for(int i=0; i < len; i++){
+				Map<String, Object> scheduleMap = new HashMap<String, Object>();
+				scheduleMap.put("s_idx", maxIdx + 1);
+				scheduleMap.put("s_uid", ids[i]);
+				scheduleMap.put("s_message", comment);
+				scheduleMap.put("s_push_date", c.getTime() );
+				SqlDao.insert("Admin.Push.Schedule.insertSchedule", scheduleMap);
+			}
+			// push 입력 끝 
+			
+		}
+		
+		if(len==0){
+			return builder.add("result", Codes.ERROR_MISSING_PARAMETER).build();
+		}
+		
+		// 스케줄 등록
+		params.put("sgid", sgid);
+		//params.put("uid", ids);
+		//params.put("sid", "");
+		params.put("registrant", sessionContext.getUserMap().get("s_sid"));
+		params.put("type", Codes.REGISTRANT_TYPE_HOSPITAL);
+		params.put("todo_date", params.get("year")+"-"+params.get("month")+"-"+params.get("day")+" "+params.get("hour")+":"+params.get("minute")+":"+"00");
+		
+		int result = SqlDao.insert("Admin.Hospital.Schedule.v2.insertSchedule", params);
+		
+		// 스케줄 해당 유저/동물 입력
+		
+		BatchQueryBuilder detailQuery = new BatchQueryBuilder();
+		
+		int user_cnt = Common.lengthOf(ids);
+		
+		for(int i = 0; i < user_cnt; i++){
+			
+			detailQuery.open();
+			detailQuery.appendString(Common.makeRownumber("sd_row", System.currentTimeMillis()*1234+""));
+			detailQuery.appendString(sgid);
+			detailQuery.appendString(ids[i]);
+			detailQuery.appendString("");
+			detailQuery.appendString("Y");
+			detailQuery.appendRaw("NULL");
+			detailQuery.close();
+			if(i < user_cnt-1){
+				detailQuery.lf();
+			}
+		}
+
+		String sss = detailQuery.build();
+		int result2 = SqlDao.insert("Admin.Hospital.Schedule.v2.insertDetails", sss);//detailQuery.build());
+		
+		builder.add("rownum", sgid);
+		
+		if(result > 0)
+			return builder.postAdd("result", Codes.SUCCESS_CODE).build();
+		else
+			return builder.postAdd("result", Codes.ERROR_QUERY_EXCEPTION).build();
+		//return ";";
+	}
+	
+	@RequestMapping(value="/updateScheduleByAdmin.latte")
+	public @ResponseBody String updateScheduleByAdmin(Model model, HttpServletRequest request, @RequestParam Map<String, String> params){
+		////logger.info("ajaxUpdateSchedule.latte");
+		
+		SessionContext sessionContext = (SessionContext) sessionContextFactory.getObject();
+		
+		JSONSimpleBuilder builder = new JSONSimpleBuilder();
+		
+		if(!sessionContext.isAuth())
+			return builder.add("result", Codes.ERROR_UNAUTHORIZED).build();
+		
+		String sid = sessionContext.getData("s_sid");
+		
+		params.put("todo_date", params.get("year")+"-"+params.get("month")+"-"+params.get("day")+" "+params.get("hour")+":"+params.get("minute")+":"+"00");
+		
+		String[] phones = Common.isValid(params.get("phone"))?params.get("phone").split(";"):null;
+		
+		// 기존 스케줄 정보를 가져옴
+		String rownum = params.get("rownum");
+		Map origin_info = null;
+		if(rownum!=null){
+			//origin = SqlDao.getMap("Admin.Hospital.Schedule.getOneSchedule", rownum);
+			
+			origin_info = SqlDao.getMap("Admin.Hospital.Schedule.v2.getScheduleInfo", rownum);
+		}
+		// 기존 스케줄 정보를 가져올 수 없음
+		if(origin_info==null){
+			return builder.add("result", Codes.ERROR_MISSING_PARAMETER).build();
+		}
+		
+		boolean is_different = false;
+		
+		// 날짜가 다른가?
+		{
+			Date ori_date = null;
+			Date mod_date = null;
+			
+			ori_date = SimpleDateFormatter.toDate("yyyy-MM-dd HH:mm:ss", Common.toString(origin_info.get("d_todo_date")));
+			mod_date = SimpleDateFormatter.toDate("yyyy-MM-dd HH:mm:ss", Common.toString(params.get("todo_date")));
+			
+			if(ori_date != null && mod_date != null){
+				is_different = !ori_date.equals(mod_date);
+			}
+		}
+		
+		// 내용이 다른가?
+		if(!is_different){
+			is_different = !Common.strEqualNN(origin_info.get("s_comment"), params.get("comment"));
+		}
+		
+		// 예약일이 변경됨?
+//		int sms_type = createSMSType(params.get("sms_rsv"));
+//		int old_sms_type = createSMSTypeByTerm((String) origin_info.get("terms"));
+		
+//		if(sms_type != old_sms_type){
+//			is_different = true;
+//		}
+		
+		int result = 0;
+		
+		String sgid = params.get("rownum");
+		params.put("sgid", sgid);
+		//params.put("rownum", "('"+params.get("rownum").replaceAll(";", "','")+"')");
+		
+		// 업데이트가 필요함
+		if(is_different){
+			
+			// 등록된 메세지를 삭제
+			String[] msg_keys = ((String) origin_info.get("_key")).split(";");
+			for(int i = 0; i < msg_keys.length; i++){
+//				SMSUtil.getInstance().cancelSMS(msg_keys[i]);
+			}
+			SqlDao.delete("Admin.Hospital.Schedule.v2.deleteMSG", sgid);
+			
+			// 메세지 새로 추
+			BatchQueryBuilder scheduleMsgQuery = new BatchQueryBuilder();
+			
+			Long seq = null;
+			
+			Calendar calendar = null;
+			//String sms_type = params.get("sms_rsv");
+			
+			result = SqlDao.update("Admin.Hospital.Schedule.v2.updateSchedule", params);
+		}
+		else{
+			result = 1;
+		}
+		
+		if(result > 0)
+			return builder.add("result", Codes.SUCCESS_CODE).build();
+		else
+			return builder.add("result", Codes.ERROR_QUERY_EXCEPTION).build();
 	}
 	
 	// 스케줄 리스트에서 날짜 변경시 호출
@@ -304,207 +479,7 @@ public class ManageScheduleAction extends AbstractAction{
 		return "admin/hospital/manage/schedule_edit";
 	}
 	
-	private int createSMSType(String splittable){
-		
-		int result = 0;
-		
-		if(!Common.isValid(splittable)){
-			return result;
-		}
-		String[] sms_type = splittable.split(";");
-		
-		for(String str : sms_type){
-			if(str.equals(SMS_3D)){
-				result |= SMS_TYPE_3D;
-			}
-			else if(str.equals(SMS_2D)){
-				result |= SMS_TYPE_2D;
-			}
-			else if(str.equals(SMS_1D)){
-				result |= SMS_TYPE_1D;
-			}
-			else if(str.equals(SMS_3H)){
-				result |= SMS_TYPE_3H;
-			}
-		}
-		return result;
-	}
 	
-	private int createSMSTypeByTerm(String splittable){
-		
-		int result = 0;
-		
-		if(!Common.isValid(splittable)){
-			return result;
-		}
-		String[] sms_type = splittable.split(";");
-		
-		for(String str : sms_type){
-			if(str.equals(SMS_3D_TERM)){
-				result |= SMS_TYPE_3D;
-			}
-			else if(str.equals(SMS_2D_TERM)){
-				result |= SMS_TYPE_2D;
-			}
-			else if(str.equals(SMS_1D_TERM)){
-				result |= SMS_TYPE_1D;
-			}
-			else if(str.equals(SMS_3H_TERM)){
-				result |= SMS_TYPE_3H;
-			}
-		}
-		return result;
-	}
-	
-	@RequestMapping(value="/ajaxRegScheduleVer2.latte")
-	public @ResponseBody String ajaxRegSchedule_2(Model model, HttpServletRequest request, @RequestParam Map<String, String> params){
-		//logger.info("ajaxRegSchedule.latte");
-		
-		SessionContext sessionContext = (SessionContext) sessionContextFactory.getObject();
-		
-		JSONSimpleBuilder builder = new JSONSimpleBuilder();
-		
-		if(!sessionContext.isAuth())
-			return builder.add("result", Codes.ERROR_UNAUTHORIZED).build();
-		
-		String sid = sessionContext.getData("s_sid");
-		String todo_date = params.get("year")+"-"+params.get("month")+"-"+params.get("day")+" "+params.get("hour")+":"+params.get("minute")+":"+"00";
-		
-		StringBuffer sb = new StringBuffer();
-		
-		// 유저 uid 리스트
-		String[] ids = Common.isValid(params.get("uid"))?params.get("uid").split(";"):null;
-		
-		// 유저 폰번호 리스트
-		String[] phones = Common.isValid(params.get("phone"))?params.get("phone").split(";"):null;
-		
-		Calendar calendar = null;
-		
-		//String[] sms_type = params.get("sms_rsv").split(";");
-		//
-		int sms_type = createSMSType(params.get("sms_rsv"));
-		
-		BatchQueryBuilder scheduleMsgQuery = new BatchQueryBuilder();
-		
-		//StringBuffer rowList = new StringBuffer();
-		
-		int len = 0;
-		
-		String sgid = Common.makeRownumber("sgid", System.currentTimeMillis()*123+"");
-		
-		if(ids!=null){
-			len = ids.length;
-			
-			// SMS 예약 및 등록
-			Long seq = null;
-			if(sms_type != 0){//sessionContext.getData("s_hospital_name")
-				int sms_type_clone = sms_type;
-				
-				calendar = Calendar.getInstance();
-				
-				while(sms_type_clone != 0){
-					
-					calendar.set(Common.toInt(params.get("year")), Common.toInt(params.get("month"))-1, Common.toInt(params.get("day")),
-							Common.toInt(params.get("hour")), Common.toInt(params.get("minute")), 0);
-					
-					String sms_term = "";
-					
-					// todo date 를 기준으로 sms발송 예약 날짜 계산
-					if((sms_type_clone & SMS_TYPE_3D) != 0){
-						calendar.add(Calendar.DAY_OF_MONTH, -3);
-						sms_type_clone = (sms_type_clone & (SMS_TYPE_3D ^ 0xffffffff));
-						sms_term = SMS_3D_TERM;
-					}
-					else if((sms_type_clone & SMS_TYPE_2D) != 0){
-						calendar.add(Calendar.DAY_OF_MONTH, -2);
-						sms_type_clone = (sms_type_clone & (SMS_TYPE_2D ^ 0xffffffff));
-						sms_term = SMS_2D_TERM;
-					}
-					else if((sms_type_clone & SMS_TYPE_1D) != 0){
-						calendar.add(Calendar.DAY_OF_MONTH, -1);
-						sms_type_clone = (sms_type_clone & (SMS_TYPE_1D ^ 0xffffffff));
-						sms_term = SMS_1D_TERM;
-					}
-					else if((sms_type_clone & SMS_TYPE_3H) != 0){
-						calendar.add(Calendar.HOUR_OF_DAY, -3);
-						sms_type_clone = (sms_type_clone & (SMS_TYPE_3H ^ 0xffffffff));
-						sms_term = SMS_3H_TERM;
-					}
-					
-					// SMS 등록
-					SMSSender sender = new SMSSender(sessionContext.getData("s_tel")!=null?sessionContext.getData("s_tel").replace("-",""):null);
-					sender.sendSMSReserve(phones, "동물병원 문자서비스", params.get("comment"),
-							sessionContext.getData("s_s_sid"), SimpleDateFormatter.toString("yyyyMMddHHmmss", calendar));
-					seq = sender.getLastKey();
-					
-					// schedule msg 쿼리 생성
-					scheduleMsgQuery.open();
-					scheduleMsgQuery.appendString(Common.makeRownumber("scm_row", System.currentTimeMillis()+""));
-					scheduleMsgQuery.appendString(sgid);
-					scheduleMsgQuery.appendString("SMS");
-					scheduleMsgQuery.appendString(SimpleDateFormatter.toString("yyyy-MM-dd HH:mm:ss", calendar.getTime()));
-					scheduleMsgQuery.appendRaw(sms_term);
-					scheduleMsgQuery.appendString(seq.toString());
-					scheduleMsgQuery.close();
-					if(sms_type_clone != 0){
-						scheduleMsgQuery.lf();
-					}
-				}
-				
-				SqlDao.insert("Admin.Hospital.Schedule.v2.insertMSG", scheduleMsgQuery.build());
-			}
-		}
-		
-		if(len==0){
-			return builder.add("result", Codes.ERROR_MISSING_PARAMETER).build();
-		}
-		
-		// 스케줄 등록
-		params.put("sgid", sgid);
-		//params.put("uid", ids);
-		//params.put("sid", "");
-		params.put("registrant", sessionContext.getUserMap().get("s_sid"));
-		params.put("type", Codes.REGISTRANT_TYPE_HOSPITAL);
-		params.put("todo_date", params.get("year")+"-"+params.get("month")+"-"+params.get("day")+" "+params.get("hour")+":"+params.get("minute")+":"+"00");
-		
-		int result = SqlDao.insert("Admin.Hospital.Schedule.v2.insertSchedule", params);
-		
-		// 스케줄 해당 유저/동물 입력
-		
-		BatchQueryBuilder detailQuery = new BatchQueryBuilder();
-		
-		int user_cnt = Common.lengthOf(ids);
-		
-		for(int i = 0; i < user_cnt; i++){
-			
-			detailQuery.open();
-			detailQuery.appendString(Common.makeRownumber("sd_row", System.currentTimeMillis()*1234+""));
-			detailQuery.appendString(sgid);
-			detailQuery.appendString(ids[i]);
-			detailQuery.appendString("");
-			detailQuery.appendString("Y");
-			detailQuery.appendRaw("NULL");
-			detailQuery.close();
-			if(i < user_cnt-1){
-				detailQuery.lf();
-			}
-		}
-
-		String sss = detailQuery.build();
-		int result2 = SqlDao.insert("Admin.Hospital.Schedule.v2.insertDetails", sss);//detailQuery.build());
-		
-		builder.add("rownum", sgid);
-		
-		//int result = SqlDao.insert("Admin.Hospital.Schedule.v2.insertSchedules", query);
-		
-//		builder.add("rownum", rowList.toString());
-		
-		if(result > 0)
-			return builder.postAdd("result", Codes.SUCCESS_CODE).build();
-		else
-			return builder.postAdd("result", Codes.ERROR_QUERY_EXCEPTION).build();
-		//return ";";
-	}
 	@RequestMapping(value="/ajaxRegSchedule.latte")
 	public @ResponseBody String ajaxRegSchedule(Model model, HttpServletRequest request, @RequestParam Map<String, String> params){
 		//logger.info("ajaxRegSchedule.latte");
@@ -560,15 +535,15 @@ public class ManageScheduleAction extends AbstractAction{
 			
 			Long seq = null;
 			if(calendar != null){//sessionContext.getData("s_hospital_name")
-				SMSSender sender = new SMSSender(sessionContext.getData("s_tel")!=null?sessionContext.getData("s_tel").replace("-",""):null);
-				if(sms_type.equals(SMS_NOW)){
-					sender.sendSMS(phones, "동물병원 문자서비스", params.get("comment"), sessionContext.getData("s_s_sid"));
-				}
-				else{
-					String rsv = (new SimpleDateFormat("yyyyMMddHHmmss")).format(calendar.getTime());
-					sender.sendSMSReserve(phones, "동물병원 문자서비스", params.get("comment"), sessionContext.getData("s_s_sid"), rsv);
-				}
-				seq = sender.getLastKey();
+//				SMSSender sender = new SMSSender(sessionContext.getData("s_tel")!=null?sessionContext.getData("s_tel").replace("-",""):null);
+//				if(sms_type.equals(SMS_NOW)){
+//					sender.sendSMS(phones, "동물병원 문자서비스", params.get("comment"), sessionContext.getData("s_s_sid"));
+//				}
+//				else{
+//					String rsv = (new SimpleDateFormat("yyyyMMddHHmmss")).format(calendar.getTime());
+//					sender.sendSMSReserve(phones, "동물병원 문자서비스", params.get("comment"), sessionContext.getData("s_s_sid"), rsv);
+//				}
+//				seq = sender.getLastKey();
 			}
 			
 			String usid = Common.makeRownumber("usid", System.currentTimeMillis()*123+"");
@@ -657,164 +632,7 @@ public class ManageScheduleAction extends AbstractAction{
 		//return ";";
 	}
 	
-	@RequestMapping(value="/ajaxUpdateScheduleVer2.latte")
-	public @ResponseBody String ajaxUpdateScheduleVer2(Model model, HttpServletRequest request, @RequestParam Map<String, String> params){
-		////logger.info("ajaxUpdateSchedule.latte");
-		
-		SessionContext sessionContext = (SessionContext) sessionContextFactory.getObject();
-		
-		JSONSimpleBuilder builder = new JSONSimpleBuilder();
-		
-		if(!sessionContext.isAuth())
-			return builder.add("result", Codes.ERROR_UNAUTHORIZED).build();
-		
-		String sid = sessionContext.getData("s_sid");
-		
-		params.put("todo_date", params.get("year")+"-"+params.get("month")+"-"+params.get("day")+" "+params.get("hour")+":"+params.get("minute")+":"+"00");
-		
-		String[] phones = Common.isValid(params.get("phone"))?params.get("phone").split(";"):null;
-		
-		// 기존 스케줄 정보를 가져옴
-		String rownum = params.get("rownum");
-		//Map origin = null;
-		Map origin_info = null;
-		if(rownum!=null){
-			//origin = SqlDao.getMap("Admin.Hospital.Schedule.getOneSchedule", rownum);
-			
-			origin_info = SqlDao.getMap("Admin.Hospital.Schedule.v2.getScheduleInfo", rownum);
-		}
-		// 기존 스케줄 정보를 가져올 수 없음
-		if(origin_info==null){
-			return builder.add("result", Codes.ERROR_MISSING_PARAMETER).build();
-		}
-		
-		boolean is_different = false;
-		
-		// 날짜가 다른가?
-		{
-			Date ori_date = null;
-			Date mod_date = null;
-			
-			ori_date = SimpleDateFormatter.toDate("yyyy-MM-dd HH:mm:ss", Common.toString(origin_info.get("d_todo_date")));
-			mod_date = SimpleDateFormatter.toDate("yyyy-MM-dd HH:mm:ss", Common.toString(params.get("todo_date")));
-			
-			if(ori_date != null && mod_date != null){
-				is_different = !ori_date.equals(mod_date);
-			}
-		}
-		
-		// 내용이 다른가?
-		if(!is_different){
-			is_different = !Common.strEqualNN(origin_info.get("s_comment"), params.get("comment"));
-		}
-		
-		// 사람이 다른가?
-		{
-			
-		}
-		
-		// 예약일이 변경됨?
-		int sms_type = createSMSType(params.get("sms_rsv"));
-		int old_sms_type = createSMSTypeByTerm((String) origin_info.get("terms"));
-		
-		if(sms_type != old_sms_type){
-			is_different = true;
-		}
-		
-		int result = 0;
-		
-		String sgid = params.get("rownum");
-		params.put("sgid", sgid);
-		//params.put("rownum", "('"+params.get("rownum").replaceAll(";", "','")+"')");
-		
-		// 업데이트가 필요함
-		if(is_different){
-			
-			// 등록된 메세지를 삭제
-			String[] msg_keys = ((String) origin_info.get("_key")).split(";");
-			for(int i = 0; i < msg_keys.length; i++){
-				SMSUtil.getInstance().cancelSMS(msg_keys[i]);
-			}
-			SqlDao.delete("Admin.Hospital.Schedule.v2.deleteMSG", sgid);
-			
-			// 메세지 새로 추
-			BatchQueryBuilder scheduleMsgQuery = new BatchQueryBuilder();
-			
-			Long seq = null;
-			
-			Calendar calendar = null;
-			//String sms_type = params.get("sms_rsv");
-			
-			
-			
-			if(sms_type != 0){//sessionContext.getData("s_hospital_name")
-				int sms_type_clone = sms_type;
-				
-				calendar = Calendar.getInstance();
-				
-				while(sms_type_clone != 0){
-					
-					calendar.set(Common.toInt(params.get("year")), Common.toInt(params.get("month"))-1, Common.toInt(params.get("day")),
-							Common.toInt(params.get("hour")), Common.toInt(params.get("minute")), 0);
-					
-					String sms_term = "";
-					
-					// todo date 를 기준으로 sms발송 예약 날짜 계산
-					if((sms_type_clone & SMS_TYPE_3D) != 0){
-						calendar.add(Calendar.DAY_OF_MONTH, -3);
-						sms_type_clone = (sms_type_clone & (SMS_TYPE_3D ^ 0xffffffff));
-						sms_term = SMS_3D_TERM;
-					}
-					else if((sms_type_clone & SMS_TYPE_2D) != 0){
-						calendar.add(Calendar.DAY_OF_MONTH, -2);
-						sms_type_clone = (sms_type_clone & (SMS_TYPE_2D ^ 0xffffffff));
-						sms_term = SMS_2D_TERM;
-					}
-					else if((sms_type_clone & SMS_TYPE_1D) != 0){
-						calendar.add(Calendar.DAY_OF_MONTH, -1);
-						sms_type_clone = (sms_type_clone & (SMS_TYPE_1D ^ 0xffffffff));
-						sms_term = SMS_1D_TERM;
-					}
-					else if((sms_type_clone & SMS_TYPE_3H) != 0){
-						calendar.add(Calendar.HOUR_OF_DAY, -3);
-						sms_type_clone = (sms_type_clone & (SMS_TYPE_3H ^ 0xffffffff));
-						sms_term = SMS_3H_TERM;
-					}
-					
-					// SMS 등록
-					SMSSender sender = new SMSSender(sessionContext.getData("s_tel")!=null?sessionContext.getData("s_tel").replace("-",""):null);
-					sender.sendSMSReserve(phones, "동물병원 문자서비스", params.get("comment"),
-							sessionContext.getData("s_s_sid"), SimpleDateFormatter.toString("yyyyMMddHHmmss", calendar));
-					seq = sender.getLastKey();
-					
-					// schedule msg 쿼리 생성
-					scheduleMsgQuery.open();
-					scheduleMsgQuery.appendString(Common.makeRownumber("scm_row", System.currentTimeMillis()+""));
-					scheduleMsgQuery.appendString(sgid);
-					scheduleMsgQuery.appendString("SMS");
-					scheduleMsgQuery.appendString(SimpleDateFormatter.toString("yyyy-MM-dd HH:mm:ss", calendar.getTime()));
-					scheduleMsgQuery.appendRaw(sms_term);
-					scheduleMsgQuery.appendString(seq.toString());
-					scheduleMsgQuery.close();
-					if(sms_type_clone != 0){
-						scheduleMsgQuery.lf();
-					}
-				}
-				
-				SqlDao.insert("Admin.Hospital.Schedule.v2.insertMSG", scheduleMsgQuery.build());
-			}
-			
-			result = SqlDao.update("Admin.Hospital.Schedule.v2.updateSchedule", params);
-		}
-		else{
-			result = 1;
-		}
-		
-		if(result > 0)
-			return builder.add("result", Codes.SUCCESS_CODE).build();
-		else
-			return builder.add("result", Codes.ERROR_QUERY_EXCEPTION).build();
-	}
+	
 	
 	@RequestMapping(value="/ajaxUpdateSchedule.latte")
 	public @ResponseBody String ajaxUpdateSchedule(Model model, HttpServletRequest request, @RequestParam Map<String, String> params){
@@ -922,29 +740,29 @@ public class ManageScheduleAction extends AbstractAction{
 			if(addFlag){
 				
 				if(calendar != null){
-					SMSSender sender = new SMSSender(sessionContext.getData("s_tel")!=null?sessionContext.getData("s_tel").replace("-",""):null);
-					if(sms_type.equals(SMS_NOW)){
-						sender.sendSMS(phones, "동물병원 문자서비스", params.get("comment"), sessionContext.getData("s_s_sid"));
-					}
-					else{
-						String rsv = (new SimpleDateFormat("yyyyMMddHHmmss")).format(calendar.getTime());
-						sender.sendSMSReserve(phones, "동물병원 문자서비스", params.get("comment"), sessionContext.getData("s_s_sid"), rsv);
-					}
-					seq = sender.getLastKey();
+//					SMSSender sender = new SMSSender(sessionContext.getData("s_tel")!=null?sessionContext.getData("s_tel").replace("-",""):null);
+//					if(sms_type.equals(SMS_NOW)){
+//						sender.sendSMS(phones, "동물병원 문자서비스", params.get("comment"), sessionContext.getData("s_s_sid"));
+//					}
+//					else{
+//						String rsv = (new SimpleDateFormat("yyyyMMddHHmmss")).format(calendar.getTime());
+//						sender.sendSMSReserve(phones, "동물병원 문자서비스", params.get("comment"), sessionContext.getData("s_s_sid"), rsv);
+//					}
+//					seq = sender.getLastKey();
 				}
 				sms_update_state = SMS_UPDATE;
 			}
 			
 			if(delFlag){
-				SMSUtil.getInstance().cancelSMS(sms_key);
+//				SMSUtil.getInstance().cancelSMS(sms_key);
 			}
 		}
 		// 예약 안 함. 기존에 sms가 있었음. 삭제
 		else if(Common.isValid(sms_key)){
 			
-			if(SMSUtil.getInstance().cancelSMS(sms_key)){
-				sms_update_state = SMS_DELETE_ONLY;
-			}
+//			if(SMSUtil.getInstance().cancelSMS(sms_key)){
+//				sms_update_state = SMS_DELETE_ONLY;
+//			}
 		}
 		
 		if(sms_update_state==SMS_NO_UPDATE){
@@ -1036,7 +854,7 @@ public class ManageScheduleAction extends AbstractAction{
 			if(s!=null){
 				String[] msg_keys = s.split(";");
 				for(int i = 0; i < msg_keys.length; i++){
-					SMSUtil.getInstance().cancelSMS(msg_keys[i]);
+//					SMSUtil.getInstance().cancelSMS(msg_keys[i]);
 				}
 			}
 			SqlDao.delete("Admin.Hospital.Schedule.v2.deleteMSG", sgid);
@@ -1082,7 +900,7 @@ public class ManageScheduleAction extends AbstractAction{
 		
 		int result = SqlDao.update("Admin.Hospital.Schedule.removeSchedules", str);
 		
-		SMSUtil.getInstance().cancelSMS((String) origin.get("s_sms_key"));
+//		SMSUtil.getInstance().cancelSMS((String) origin.get("s_sms_key"));
 //		String sms_key = params.get("sms_key");
 //		if(Common.isValid(sms_key)){
 //			Map m = SqlDao.getMap("SMS.getSMS", sms_key);
@@ -1309,22 +1127,22 @@ public class ManageScheduleAction extends AbstractAction{
 							
 							String sms_term = (day*86400)+"";
 							
-							SMSSender sender = new SMSSender(sessionContext.getData("s_tel"));
-							String rsv = SimpleDateFormatter.toString("yyyyMMddHHmmss", calendar);
-							sender.sendSMSReserve(phones, "동물병원 문자서비스", comment, sessionContext.getData("s_s_sid"), rsv);
-							seq = sender.getLastKey();
-							
-							scheduleMsgQuery.open();
-							scheduleMsgQuery.appendString(Common.makeRownumber("scm_row", System.currentTimeMillis()+""));
-							scheduleMsgQuery.appendString((String) next_schedule.get("s_sgid"));
-							scheduleMsgQuery.appendString("SMS");
-							scheduleMsgQuery.appendString(SimpleDateFormatter.toString("yyyy-MM-dd HH:mm:ss", calendar));
-							scheduleMsgQuery.appendRaw(sms_term);
-							scheduleMsgQuery.appendString(seq+"");
-							scheduleMsgQuery.close();
-							if(day > 1){
-								scheduleMsgQuery.lf();
-							}
+//							SMSSender sender = new SMSSender(sessionContext.getData("s_tel"));
+//							String rsv = SimpleDateFormatter.toString("yyyyMMddHHmmss", calendar);
+//							sender.sendSMSReserve(phones, "동물병원 문자서비스", comment, sessionContext.getData("s_s_sid"), rsv);
+//							seq = sender.getLastKey();
+//							
+//							scheduleMsgQuery.open();
+//							scheduleMsgQuery.appendString(Common.makeRownumber("scm_row", System.currentTimeMillis()+""));
+//							scheduleMsgQuery.appendString((String) next_schedule.get("s_sgid"));
+//							scheduleMsgQuery.appendString("SMS");
+//							scheduleMsgQuery.appendString(SimpleDateFormatter.toString("yyyy-MM-dd HH:mm:ss", calendar));
+//							scheduleMsgQuery.appendRaw(sms_term);
+//							scheduleMsgQuery.appendString(seq+"");
+//							scheduleMsgQuery.close();
+//							if(day > 1){
+//								scheduleMsgQuery.lf();
+//							}
 						}
 						
 						String s = scheduleMsgQuery.build();

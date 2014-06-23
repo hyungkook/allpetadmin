@@ -100,6 +100,34 @@ function cancel(){
 	goPage('hospitalHome.latte');
 }
 
+function imageDelete(type){
+	if( type == 'HEADER' ){
+		var headerImg = '${header_img.s_image_path}';
+		console.log(headerImg);
+		if( headerImg != null && headerImg != ''){
+			$('#header_img').attr('src', '${con.IMGPATH}/common/default_header.jpg');
+			$('#header_id').val("");
+		}else{
+			alert('헤더 이미지 설정이 되어있지 않습니다.');
+			return;
+		}
+		
+	}else if( type == 'LOGO' ){
+		var logoImg = '${logo_img.s_image_path}';
+		console.log(logoImg);
+		if( logoImg != null && logoImg != ''){
+			$('#logo_img').attr('src', '${con.IMGPATH}/contents/sample_logo02.png');
+			$('#logo_id').val("");
+		}else{
+			alert('로고 이미지 설정이 되어있지 않습니다.');
+			return;
+		}
+		
+		
+	}
+	
+}
+
 function imageUpdate(targetId,imgsrc,iid){
 	
 	$('#'+targetId+"img").attr('src',imgsrc);
@@ -188,7 +216,8 @@ $(document).ready(function(){
 				<div class="dl_type01 mt05">
 					<dl style="height:81px;">
 						<dd style="margin:0 0 0 90px;">
-						<p id="logo_img_btn" class="btn_gray02" style="width:120px; position:relative; overflow:hidden;"><a id="pppp2" data-role="button">찾아보기</a>
+						<p class="btn_gray02" id="logo_img_btn" style="width:120px; position:relative; overflow:hidden; display:inline-block;"><a id="pppp2" data-role="button">찾아보기</a>
+						<p class="btn_gray02" style="width:50px; display:inline-block; margin-left:4px;"><a href="" onclick="imageDelete('LOGO')" data-role="button">삭제</a>
 						</dd>
 						<dd style="margin:5px 0 0 90px;">* 로고 권장사이즈 : 158px * 158px</dd>
 						<dd class="thum02"><img id="logo_img" src="<c:choose><c:when test="${not empty logo_img.s_image_path}">${con.img_dns}${logo_img.s_image_path}</c:when><c:otherwise>${con.IMGPATH}/contents/sample_logo02.png</c:otherwise></c:choose>" alt="" width="79" height="79"/></dd>
@@ -203,7 +232,7 @@ $(document).ready(function(){
 					<dl style=" min-height:70px;">
 						<dd style="margin:0 0 0 130px;">
 							<p class="btn_gray02" id="header_img_btn" style="width:100px; display:inline-block;"><a data-role="button">찾아보기</a>
-							<p class="btn_gray02" style="width:50px; display:inline-block; margin-left:4px;"><a href="index.html" data-role="button">삭제</a>
+							<p class="btn_gray02" style="width:50px; display:inline-block; margin-left:4px;"><a href=""  onclick="imageDelete('HEADER')" data-role="button">삭제</a>
 						</dd>
 						<dd style="margin:5px 0 0 130px;">*이미지 권장사이즈 : 800px * 450px</dd>
 						<dd style="margin:5px 0 0 130px;">*이미지를 등록하지 않으시면, 기본으로 제공되는 이미지가 등록됩니다.</dd>

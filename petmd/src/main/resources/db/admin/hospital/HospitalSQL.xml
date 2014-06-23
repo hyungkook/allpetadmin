@@ -19,6 +19,7 @@
 			DB_ALLPET.T_HOSPITAL_MORE_INFO
 		SET
 			S_INTRODUCE = #{introduce},
+			s_shortIntroduce = #{shortIntroduce},
 			S_KEYWORD = #{keyword},
 			S_REPRESENT_STAFF = #{represent_staff}
 		WHERE

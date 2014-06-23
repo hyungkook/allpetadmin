@@ -19,6 +19,7 @@
 			BI.s_corp_reg_number,
 			BI.s_company_name,
 			MI.s_introduce,
+			MI.s_shortIntroduce,
 			MI.s_keyword,
 			MI.s_display_tel,
 			MI.s_tel,

@@ -23,7 +23,6 @@ pageContext.setAttribute("equot", "\\\"");
 
 <c:set var="pre_data" value="${pre_data}/${boardContents.s_iid}"/>
 <c:set var="pre_data" value="${pre_data}/${boardContents.s_subject}"/>
-<c:set var="pre_data" value="${pre_data}/${fn:replace(fn:replace(boardContents.s_contents,crlf,'\\\n'),quot,equot)}"/>
 <%-- <c:set var="pre_data" value="${pre_data}/${fn:replace(boardContents.s_contents,quot,equot)}"/> --%>
 <c:forEach var="video_item" items="${videoList}" varStatus="c">
 <c:set var="pre_data" value="${pre_data}/${fn:replace(video_item.s_value,quot,equot)}"/>

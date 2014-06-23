@@ -65,6 +65,17 @@ public class SqlDao {
 		return result;
 	}
 	
+	public static int getInt(String sqlName, Object param){
+		int result = -1;
+		try {
+			result = sqlSession.selectOne(sqlName, param);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
 	public static int insert(String sqlName, Object param){
 		int result = -1;
 		try {

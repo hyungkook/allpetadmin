@@ -41,7 +41,7 @@ function save(){
 	<div data-role="page">
 		
 		<jsp:include page="../include/manage_title_bar.jsp">
-			<jsp:param name="title_bar_title" value="포인트출납 및 회원관리"/>
+			<jsp:param name="title_bar_title" value="접종관리 편집"/>
 			<jsp:param name="title_btn_icon" value="home"/>
 			<jsp:param name="back_function" value="back"/>
 		</jsp:include>

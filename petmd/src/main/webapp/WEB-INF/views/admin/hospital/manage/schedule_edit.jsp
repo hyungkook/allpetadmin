@@ -132,9 +132,10 @@ function createSchedule(){
 		return;
 	}
 	
+	
 	$.ajax({
 		type:'POST',
-		url:'ajaxRegScheduleVer2.latte',
+		url:'createScheduleByAdmin.latte',
 		data:{
 			year:$('#year').val(),
 			month:$('#month').val(),
@@ -143,8 +144,7 @@ function createSchedule(){
 			minute:$('#reg_minute').html(),
 			comment:$('#comment').val(),
 			uid:uidList,
-			phone:phoneList,
-			sms_rsv:$('#checkbox-c1').is(':checked')?sms_radio_val:''
+			userAlert:getSmsCheckValue()
 		},
 		dataType:'text',
 		success:function(response, status, xhr){
@@ -155,12 +155,7 @@ function createSchedule(){
 				
 				var msg = '';
 				if($('#checkbox-c1').is(':checked')){
-					if(sms_radio_val=='sms_now'){
-						msg='등록 성공. 문자가 발송되었습니다.';
-					}
-					else{
-						msg='등록 성공. 문자 발송 예약되었습니다.';
-					}
+					msg='스케쥴이 등록되었습니다';
 				}else{
 					msg='등록되었습니다';
 				}
@@ -208,7 +203,7 @@ function modifySchedule(){
 	
 	$.ajax({
 		type:'POST',
-		url:'ajaxUpdateScheduleVer2.latte',
+		url:'updateScheduleByAdmin.latte',
 		data:{
 			rownum:g_rownum,
 			year:$('#year').val(),
@@ -218,8 +213,7 @@ function modifySchedule(){
 			minute:$('#reg_minute').html(),
 			comment:$('#comment').val(),
 			phone:phoneList,
-			sms_rsv:$('#checkbox-c1').is(':checked')?sms_radio_val:'',
-			sms_key:'${schedule.s_sms_key}'
+			userAlert:getSmsCheckValue()
 		},
 		dataType:'text',
 		success:function(response, status, xhr){
@@ -229,7 +223,6 @@ function modifySchedule(){
 			if(json.result=='${codes.SUCCESS_CODE}'){
 				
 				showDialog('수정되었습니다.','default',function(){
-					//goPage('manageSchedule.latte');
 					history.back();
 				});
 			}
@@ -420,83 +413,39 @@ function checkReserve(cb){
 	}
 }
 
-var sms_radio_val = '';
-
 function sms_radio_disable(id){
 	if($('#'+id+"_btn").hasClass('on')){$('#'+id+"_btn").removeClass('on');}
-	//if(!$('#'+id).hasClass('off')){$('#'+id).addClass('btn_bar_gray');}
 }
 function sms_radio_enable(id){
-	
 	$('#'+id+"_btn").addClass('on');
-	//if($('#'+id).hasClass('btn_bar_gray')){$('#'+id).removeClass('btn_bar_gray');}
-	//if(!$('#'+id).hasClass('btn_bar_black')){$('#'+id).addClass('btn_bar_black');}
-}
-
-function sms_toggle(){
-	
-}
-
-var sms_radio_array = new Array();
-sms_radio_array['sms_3d']="N";
-sms_radio_array['sms_2d']="N";
-sms_radio_array['sms_1d']="N";
-sms_radio_array['sms_3h']="N";
-
-function create_sms_radio_val(){
-	
-	var str = "";
-	var fill = false;
-	if(sms_radio_array['sms_3d']=="Y"){
-		if(fill){str+=";";}
-		else{fill=true;}
-		str+="sms_3d";
-	}
-	if(sms_radio_array['sms_2d']=="Y"){
-		if(fill){str+=";";}
-		else{fill=true;}
-		str+="sms_2d";
-	}
-	if(sms_radio_array['sms_1d']=="Y"){
-		if(fill){str+=";";}
-		else{fill=true;}
-		str+="sms_1d";
-	}
-	if(sms_radio_array['sms_3h']=="Y"){
-		if(fill){str+=";";}
-		else{fill=true;}
-		str+="sms_3h";
-	}
-	return str;
 }
 
 function sms_radio(target){
 	
 	if($('#'+target+"_btn").hasClass('on')){
 		$('#'+target+"_btn").removeClass('on');
-		sms_radio_array[target]="N";
-	}
-	else{
+		$('input:checkbox[name=sms_chk][value='+target+']').attr('checked','');
+	}else{
 		$('#'+target+"_btn").addClass('on');
-		sms_radio_array[target]="Y";
+		$('input:checkbox[name=sms_chk][value='+target+']').attr('checked','checked');
 	}
 	
-	/* sms_radio_disable('sms_3d');
-	sms_radio_disable('sms_1d');
-	sms_radio_disable('sms_3h');
-	sms_radio_disable('sms_1h');
-	sms_radio_disable('sms_now');
-	
-	sms_radio_enable(target); */
-	
-	$('#'+target).trigger('create');
-
-	//sms_radio_val = target;
-	sms_radio_val = create_sms_radio_val();
-	
-	//alert(sms_radio_val);
 }
 
+function getSmsCheckValue(){
+	var userAlert = '';
+	if( $('#checkbox-c1').is(':checked') == true ){
+		$('input:checkbox[name=sms_chk]:checked').each(function(i){
+			if( i == 0 ){
+				userAlert = $(this).val();
+			}else{
+				userAlert = userAlert + ";" + $(this).val();  
+			}
+		});
+	}
+	
+	return userAlert;
+}
 
 
 
@@ -614,55 +563,6 @@ function removeUser(id,phone){
 	}
 	
 	//console.log('remove '+uidList+' '+phoneList);
-}
-
-function pageChange(type,page,id,val){
-	
-	$.ajax({
-		url:'ajaxInnerPetList.latte',
-		type:'POST',
-		data:{
-			uid:id,
-			pageNumber:page,
-			pagingBlockId:id,
-			pagingSendValue:val
-		},
-		dataType:'text',
-		success:function(response, status, xhr){
-			
-			$('#pet_list_inner'+id).empty();
-			$('#pet_list_inner'+id).append(response);
-		},
-		error:function(xhr,status,error){
-			alert(status+'\n'+error);
-		}
-	});
-}
-
-function openPetList(index, id){
-	
-	if($('#pet_list_inner'+index).html()==''){
-		$.ajax({
-			url:'ajaxInnerPetList.latte',
-			type:'POST',
-			data:{
-				pagingBlockId:index,
-				pagingSendValue:id
-			},
-			dataType:'text',
-			success:function(response, status, xhr){
-				
-				$('#pet_list_inner'+index).append(response);
-				$('#pet_list'+index).show();
-			},
-			error:function(xhr,status,error){
-				alert(status+'\n'+error);
-			}
-		});
-		
-	}
-	else	
-		$('#pet_list'+index).show();
 }
 
 function checkbox(me,targetId){
@@ -877,78 +777,12 @@ function scheduleConfirm(){
 		<!-- content 시작-->
 		<div data-role="content" id="contents" style="overflow: hidden">
 		
-			<%-- <div class="mypage_header">
-				<div class="back"><a data-role="button" data-rel="back"><img height="0" src="${con.IMGPATH}/btn/btn_back_t.png"/></a></div>
-				스케줄 <c:if test="${params.type eq \"new\"}">등록</c:if><c:if test="${params.type eq \"modify\"}">편집</c:if>
-			</div> --%>
-			
 			<div id="calendar_area">
 			
 			<!-- 회원 정보 시작-->
 			<div class="top_info">총 <span id="user_cnt1">${fn:length(userList)}명</span>의 회원이 선택되었습니다.</div>
 			<!-- 회원 정보 끝-->
 			
-			<%-- <div>
-				<p>사용자 검색(휴대폰 번호로 검색하실 수 있습니다)</p>
-				
-				<div class="btn_area01">
-					<div class="rate50">
-					<div class="input01">
-						<p class="inner_input"><input type="text" id="phone"></p>
-					</div>
-					</div>
-					<p class="rate50 btn_bar_black btn_bar_shape02">
-						<a data-role="button" onclick="searchUser('',$('#phone').val(),'')"><span>검색</span></a>
-					</p>
-				</div>
-				
-				<p>숫자만 입력해 주세요</p>
-				
-				<div id="user_list">
-					<jsp:include page="user_inner_schedule.jsp"/>
-				</div>
-				
-				<input type="hidden" id="uid"/>
-				
-				<div class="list_num" id="user_list_paging">
-	
-					<span class="btn_num"><a onclick="prePageChange('prev','1','${pagingBlockId}','${pagingSendValue}');" data-role="button"><img src="${con.IMGPATH}/btn/btn_prev.png" alt="" width="7" height="10" style="padding-right:2px;"/></a></span>
-					<span class="btn_num"><a onclick="prePageChange('prev','${pageGroupNumber * pageGroupSize + 1 - pageGroupSize}','${pagingBlockId}','${pagingSendValue}');" data-role="button"><img src="${con.IMGPATH}/btn/btn_prev.png" alt="" width="7" height="10" style="padding-right:2px;"/></a></span>
-					<span id="user_list_paging_inner">
-					<a onclick="prePageChange('cur','${pageGroupNumber * pageGroupSize + c.count}','${pagingBlockId}','${pagingSendValue}');"><span style="color:red;">${pageGroupNumber * pageGroupSize + c.count}</span></a>&nbsp;
-					</span>
-						<c:forEach begin="0" end="${curPageGroupSize-1}" varStatus="c">
-							<c:if test="${pageGroupNumber * pageGroupSize + c.count <= params.pageCount}">
-								<c:choose>
-									<c:when test="${pageGroupNumber * pageGroupSize + c.count eq params.pageNumber}">
-									&nbsp;<a onclick="prePageChange('cur','${pageGroupNumber * pageGroupSize + c.count}','${pagingBlockId}','${pagingSendValue}');"><span style="color:red;">${pageGroupNumber * pageGroupSize + c.count}</span></a>&nbsp;
-									</c:when>
-									<c:otherwise>
-									&nbsp;<a onclick="prePageChange('cur','${pageGroupNumber * pageGroupSize + c.count}','${pagingBlockId}','${pagingSendValue}');"><span>${pageGroupNumber * pageGroupSize + c.count}</span></a>&nbsp;
-									</c:otherwise>
-								</c:choose>
-							</c:if>
-						</c:forEach>
-					<span class="num">${params.pageNumber} / ${params.pageCount}</span>
-					<span class="btn_num"><a onclick="prePageChange('next','${pageGroupNumber * pageGroupSize + 1 + curPageGroupSize}','${pagingBlockId}','${pagingSendValue}');" data-role="button"><img src="${con.IMGPATH}/btn/btn_next.png" alt="" width="7" height="10" style="padding-left:2px;"/></a></span>
-					<span class="btn_num"><a onclick="prePageChange('next','${params.pageCount}','${pagingBlockId}','${pagingSendValue}');" data-role="button"><img src="${con.IMGPATH}/btn/btn_next.png" alt="" width="7" height="10" style="padding-left:2px;"/></a></span>
-					
-				</div>
-				
-				<script>
-				$('#user_list_paging').hide();
-				</script>
-			</div> --%>
-			
-			<%-- <div class="schedule_top">
-				<div class="center">
-					<div class="paging">
-						<p><a data-role="button" id="pre_btn" onclick="createPreMonthCalendar(null);"><img src="${con.IMGPATH}/btn/btn_arrow_l03_t.png" width="29" height="29"/></a></p>
-						<span class="headline_white" id="title"></span>
-						<p><a data-role="button" id="next_btn" onclick="createNextMonthCalendar(null);"><img src="${con.IMGPATH}/btn/btn_arrow_r03_t.png" width="29" height="29"/></a></p>
-					</div>
-				</div>
-			</div> --%>
 			
 			<!-- 스케줄 상단 시작-->
 			<div class="schedule_top">
@@ -976,26 +810,6 @@ function scheduleConfirm(){
 				<p class="btn_modify"><a onclick="openTimePopup();" data-role="button"><img src="${con.IMGPATH}/btn/icon_modify.png" alt="" width="31" height="31" /></a></p>
 			</div>
 			
-			<%-- <div class="schedule_time_select">
-				<table>
-					<colgroup>
-						<col width="50%"/><col width="*"/>
-					</colgroup>
-					<tr>
-						<td class="title">
-							<img src="${con.IMGPATH}/common/icon_time_t.png" height="20px"/>
-							<span>예약시간 설정</span>
-						</td>
-						<td class="time">
-							<span id="reg_ampm">AM</span>
-							<span id="reg_hour">07</span>
-							<span>:</span>
-							<span id="reg_minute">00</span>
-							<img onclick="openTimePopup();" src="${con.IMGPATH}/btn/btn_time_edit_t.png" height="30px"/>
-						</td>
-					</tr>
-				</table>
-			</div> --%>
 			
 			<input type="hidden" id="year"/>
 			<input type="hidden" id="month"/>
@@ -1004,15 +818,17 @@ function scheduleConfirm(){
 			<div class="a_type02_b">
 				<h3><span id="todo_date">2014년 1월 5일</span> (<span id="print_time">07:00</span>) 일정<span class="txt_r">0/80</span></h3>
 				<p class="textarea01 mt05"><textarea id="comment" style="width:100%; height:100px;" placeholder="스케줄 내용을 입력해 주세요."></textarea></p>
-				<%--
-				<c:if test="${sms_sended eq 'Y' and not empty schedule.d_sms_time}"><p class="txt_gray12 mt05">문자발송(회원에게 ${schedule.d_sms_time} 발송되었습니다.)</p></c:if>
 				<div class="sms_box mt15">
 					<p class="checkbox02">
 						<input type="checkbox" id="checkbox-c1" value="c-1" onchange="checkReserve($(this));"/>
-						<label for="checkbox-c1">문자발송(회원에게 발송됩니다.)</label>
+						<label for="checkbox-c1">사용자 알림 설정</label>
 					</p>
 					<div class="sms_btnarea mt05" id="sms_select_area">
 						<ul>
+							<input type="checkbox" name="sms_chk" value="sms_3d" style="display: none;"/>
+							<input type="checkbox" name="sms_chk" value="sms_2d" style="display: none;"/>
+							<input type="checkbox" name="sms_chk" value="sms_1d" style="display: none;"/>
+							<input type="checkbox" name="sms_chk" value="sms_3h" style="display: none;"/>
 							<li id="sms_3d_btn" style="width:23%;"><a data-role="button" onclick="sms_radio('sms_3d');">3일전</a></li>
 							<li id="sms_2d_btn" style="width:23%;"><a data-role="button" onclick="sms_radio('sms_2d');">2일전</a></li>
 							<li id="sms_1d_btn" style="width:23%;"><a data-role="button" onclick="sms_radio('sms_1d');">1일전</a></li>
@@ -1020,7 +836,6 @@ function scheduleConfirm(){
 						</ul>
 					</div>
 				</div>
-				 --%>
 				<%-- 유저가 등록했고 시간이 아직 유효할 경우 or 새로 등록하는 경우 --%>
 				<c:if test="${schedule.timeout_flag eq 'N' or params.type eq 'new'}">
 				<div class="btn_area02 mt10" id='modify_btn_area'>
@@ -1049,108 +864,11 @@ function scheduleConfirm(){
 				<p class="btn_black02" ><a onclick="openUserlist();" data-role="button">수신자 변경/추가</a></p>
 			</div>
 			
-			<%-- <div class="a_type02">
-				<c:if test="${schedule.s_type eq codes.REGISTRANT_TYPE_HOSPITAL}">
-					<p class="title01">[${schedule.s_registrant_name}]</p>
-				</c:if>
-				<!-- <h3><span id="todo_date">2014년 1월 5일</span> (<span id="print_time">07:00</span>)일정</h3>
-				<span style="font-size:small;">문자는 80자까지만 발송됩니다.</span>
-				<p class="textarea01">
-					<textarea id="comment" rows="3" placeholder="스케줄 내용을 입력해 주세요."></textarea>
-				</p> -->
-				
-				<div class="sms_area">
-				<p><input type="checkbox" id="sms_reserve" onchange="checkReserve($(this));" <c:if test="${not empty schedule.d_sms_time}">checked="checked"</c:if>/><span onclick="$('#sms_reserve').click();">문자발송(회원에게 발송됩니다.)</span></p>
-				<c:if test="${sms_sended eq 'Y' and not empty schedule.d_sms_time}"><p>마지막 발송 시간 ${schedule.d_sms_time}</p></c:if>
-				<!-- <div id="sms_select_area">
-				<div class="btn_area01">
-					<p id='sms_3d' class="rate25 btn_bar_gray btn_bar_shape02 mt08">
-						<a data-role="button" id="sms_3d_btn" onclick="sms_radio('sms_3d');"><span>3일전</span></a>
-					</p>
-					<p id='sms_1d' class="rate25 btn_bar_gray btn_bar_shape02 mt08">
-						<a data-role="button" id="sms_1d_btn" onclick="sms_radio('sms_1d');"><span>1일전</span></a>
-					</p>
-					<p id='sms_3h' class="rate25 btn_bar_gray btn_bar_shape02 mt08">
-						<a data-role="button" id="sms_3h_btn" onclick="sms_radio('sms_3h');"><span>3시간전</span></a>
-					</p>
-					<p id='sms_1h' class="rate25 btn_bar_gray btn_bar_shape02 mt08">
-						<a data-role="button" id="sms_1h_btn" onclick="sms_radio('sms_1h');"><span>1시간전</span></a>
-					</p>
-				</div>
-				<p id='sms_now' class="btn_bar_gray btn_bar_shape02 mt08">
-					<a data-role="button" id="sms_now_btn" onclick="sms_radio('sms_now');"><span>즉시</span></a>
-				</p>
-				</div> -->
-				<!-- </div> -->
-			
-			</div>
-			<div class="a_type02">
-				<p id='reg_btn_area' class="btn_bar_red btn_bar_shape02 mt08">
-					<a data-role="button" id="reg_btn"><span>일정 등록</span></a>
-				</p>
-				<div id='modify_btn_area'>
-					유저가 등록했고 시간이 아직 유효할 경우 or 새로 등록하는 경우
-					<c:if test="${schedule.timeout_flag eq 'N' or params.type eq 'new'}">
-					<div class="btn_area02 mt08">
-						<div class="l_30">
-							<p class="btn_bar_black btn_bar_shape02">
-								<a data-role="button" onclick="removeSchedule();"><span>삭제</span></a>
-							</p>
-						</div>
-						<div class="r_70">
-							<p class="btn_bar_red btn_bar_shape02">
-								<a data-role="button" id="modify_btn" onclick="modifySchedule();"><span>수정</span></a>
-							</p>
-						</div>
-					</div>
-					</c:if>
-					병원에서 등록했거나 시간이 유효하지 않을 경우
-					<c:if test="${schedule.timeout_flag eq 'Y'}">
-					<p class="btn_bar_black btn_bar_shape02 mt08">
-						<a data-role="button" onclick="removeSchedule();"><span>삭제</span></a>
-					</p>
-					</c:if>
-				</div>
-			</div> --%>
-			
 			</div>
 			
 			<div id="user_area" style="display:none;">
-			
-			<div>
-				
 				<input type="hidden" id="uid"/>
 				
-				<%-- <div class="list_num" id="user_list_paging">
-	
-					<span class="btn_num"><a onclick="prePageChange('prev','1','${pagingBlockId}','${pagingSendValue}');" data-role="button"><img src="${con.IMGPATH}/btn/btn_prev.png" alt="" width="7" height="10" style="padding-right:2px;"/></a></span>
-					<span class="btn_num"><a onclick="prePageChange('prev','${pageGroupNumber * pageGroupSize + 1 - pageGroupSize}','${pagingBlockId}','${pagingSendValue}');" data-role="button"><img src="${con.IMGPATH}/btn/btn_prev.png" alt="" width="7" height="10" style="padding-right:2px;"/></a></span>
-					<span id="user_list_paging_inner">
-					<a onclick="prePageChange('cur','${pageGroupNumber * pageGroupSize + c.count}','${pagingBlockId}','${pagingSendValue}');"><span style="color:red;">${pageGroupNumber * pageGroupSize + c.count}</span></a>&nbsp;
-					</span> --%>
-						<%-- <c:forEach begin="0" end="${curPageGroupSize-1}" varStatus="c">
-							<c:if test="${pageGroupNumber * pageGroupSize + c.count <= params.pageCount}">
-								<c:choose>
-									<c:when test="${pageGroupNumber * pageGroupSize + c.count eq params.pageNumber}">
-									&nbsp;<a onclick="prePageChange('cur','${pageGroupNumber * pageGroupSize + c.count}','${pagingBlockId}','${pagingSendValue}');"><span style="color:red;">${pageGroupNumber * pageGroupSize + c.count}</span></a>&nbsp;
-									</c:when>
-									<c:otherwise>
-									&nbsp;<a onclick="prePageChange('cur','${pageGroupNumber * pageGroupSize + c.count}','${pagingBlockId}','${pagingSendValue}');"><span>${pageGroupNumber * pageGroupSize + c.count}</span></a>&nbsp;
-									</c:otherwise>
-								</c:choose>
-							</c:if>
-						</c:forEach> --%>
-					<%-- <span class="num">${params.pageNumber} / ${params.pageCount}</span> --%>
-				<%-- 	<span class="btn_num"><a onclick="prePageChange('next','${pageGroupNumber * pageGroupSize + 1 + curPageGroupSize}','${pagingBlockId}','${pagingSendValue}');" data-role="button"><img src="${con.IMGPATH}/btn/btn_next.png" alt="" width="7" height="10" style="padding-left:2px;"/></a></span>
-					<span class="btn_num"><a onclick="prePageChange('next','${params.pageCount}','${pagingBlockId}','${pagingSendValue}');" data-role="button"><img src="${con.IMGPATH}/btn/btn_next.png" alt="" width="7" height="10" style="padding-left:2px;"/></a></span>
-					
-				</div> --%>
-				
-				<script>
-				$('#user_list_paging').hide();
-				</script>
-			</div>
-			
 				<div class="a_type01">
 				<h3>대상 회원 추가 <span class="t01">(휴대폰 번호로 검색하실 수 있습니다.)</span></h3>
 				<div class="area00 mt05">
@@ -1165,15 +883,9 @@ function scheduleConfirm(){
 					<jsp:include page="user_inner_schedule.jsp"/>
 					</ul>
 				</div>
-				<%-- <div class="paging03">
-					<p><a href="index.html" data-role="button"><img src="${con.IMGPATH}/btn/btn_arrow_l03.png" width="29" height="29"/></a></p>
-					<span class="txt"><label>2</label>/123</span>
-					<p><a href="index.html" data-role="button"><img src="../images/btn/btn_arrow_r03.png" width="29" height="29"/></a></p>
-				</div> --%>
 				<p class="txt_gray12 mt05">총 <span class="num" id="user_cnt2">${fn:length(userList)}명</span>의 회원이 선택되었습니다.</p>
 				
 				<p class="btn_red02 mt15"><a onclick="openCalendar();" data-role="button">스케줄 입력하기</a></p>
-				
 				
 			</div>
 			

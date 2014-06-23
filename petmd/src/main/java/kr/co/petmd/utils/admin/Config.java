@@ -48,11 +48,6 @@ public class Config {
 	//public static String IMGPATH	= dns + "/common/template/images";
 	public static String IMGPATH	= "../common/template/images";
 	public static String IMGPATH_OLD	= "../common/template/images/old";
-
-	// SMS Info
-	public static String ADV_ID		= "ADV_00000000000000000000000000000";
-	public static String ADV_SMS_ID	= "adventures";
-	public static String ADV_TELNO		= "16661609";
 	
 	// Page Count Info
 	public static int SHOP_PAGE_COUNT 		= 15;

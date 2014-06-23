@@ -70,4 +70,34 @@
 		</beans:property>
 	</beans:bean>
 	
+	<!-- ============================================================= -->
+    <!-- Cron Job -->
+    <!-- ============================================================= -->
+	<!-- Schedule Reader -->
+	<beans:bean id="pushJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <beans:property name="jobClass" value="kr.co.petmd.scheduler.PushJob" />
+    </beans:bean>
+    <beans:bean id="pushTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+        <beans:property name="jobDetail" ref="pushJob"/>
+        <beans:property name="startDelay" value="5000"/>
+        <beans:property name="repeatInterval" value="120000"/>
+    </beans:bean>
+	
+    <beans:bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <beans:property name="triggers">
+            <beans:list>
+                <beans:ref bean="pushTrigger"/>
+            </beans:list>
+        </beans:property>
+    	<beans:property name="quartzProperties">
+            <beans:props>
+                <beans:prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</beans:prop>
+                <beans:prop key="org.quartz.threadPool.threadCount">5</beans:prop>
+                <beans:prop key="org.quartz.threadPool.threadPriority">4</beans:prop>
+                <beans:prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</beans:prop>
+                <beans:prop key="org.quartz.jobStore.misfireThreshold">120000</beans:prop>
+            </beans:props>
+        </beans:property>
+    </beans:bean>
+	
 </beans:beans>

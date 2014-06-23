@@ -105,29 +105,6 @@ pageContext.setAttribute("equot", "\\\"");
 	});
 		
 	function uploadImage(){
-			
-		//openCropUploadWaitingLayer();
-		
-		//$('#uploadForm').attr('action','ajaxIntroduceImgUpload.latte');
-		
-		/* $('#uploadForm').ajaxForm({
-				dataType:'text'
-		});
-		
-		$("#uploadForm").ajaxSubmit({
-		    statusCode: {   
-		      400: function() {
-		        alert("파일 내용이 잘못되었습니다.");
-		      },   
-		      500: function() {
-		        alert("파일을 업로드할 수 없습니다.");
-		      }
-		    },      
-		    success: function(data) {
-		      alert("업로드 되었습니다. 페이지를 다시 읽습니다.");
-		      //window.location.reload(true);
-		    }
-		  }); */
 
 		$('#uploadForm').ajaxForm({
 			beforeSubmit: function(a,f,o) {

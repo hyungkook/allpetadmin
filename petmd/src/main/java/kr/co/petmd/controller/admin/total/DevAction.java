@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import kr.co.petmd.dao.SqlDao;
 import kr.co.petmd.utils.admin.Codes;
 import kr.co.petmd.utils.common.Common;
-import kr.co.petmd.utils.common.SMSSender;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,34 +93,6 @@ public class DevAction {
 		logger.info("editCustomCategory.latte");
 		
 		return "client/hospital/hospital_service_admin";
-	}
-	
-	@RequestMapping(value = "/smsTest1.latte")
-	public String smsTest1(Model model, HttpServletRequest request, @RequestParam Map<String, String> params) {
-		logger.info("smsTest1.latte");
-		
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(2014, 3-1, 10, 18, 5, 0);
-			
-			Long seq = null;
-			SMSSender sender = new SMSSender(null);
-			
-			if(calendar != null){
-//				if(sms.equals("sms_now")){
-//					sender.sendSMS("01024781727", "문자 예약 발송", params.get("comment"), sessionContext.getData("s_s_sid"));
-//					//SMSUtil.getInstance().sendSMS(phones[i], "문자 예약 발송", params.get("comment"), sessionContext.getData("s_s_sid"));
-//				}
-//				else{
-				String rsv = (String.format("%04d%02d%02d%02d%02d%02d", 
-						calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)+1, calendar.get(Calendar.DAY_OF_MONTH),
-						calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND)));
-				sender.sendSMSReserve("01024781727", "테스트", "테스트", "test123", rsv);
-					//SMSUtil.getInstance().sendSMSReserve(phones[i], "문자 예약 발송", params.get("comment"), sessionContext.getData("s_s_sid"), rsv);
-//				}
-			}
-			seq = sender.getLastKey();
-		
-		return "";
 	}
 	
 	@RequestMapping(value = "/qtest1.latte")

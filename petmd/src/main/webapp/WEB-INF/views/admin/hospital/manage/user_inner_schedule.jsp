@@ -6,35 +6,6 @@
 
 <c:forEach var="item" items="${userList}" varStatus="c">
 <c:set var="itemIndex" value="${(params.pageNumber - 1) * (params.onePageCountRow) + c.index}"/>
-<%-- <div style="overflow:hidden;">
-	<input type="hidden" id="id${itemIndex}" value="${item.s_uid}"/>
-	<div style="float:left;">
-		<p style="padding:10px;">${item.s_name} (<span id="phone${itemIndex}"></span>)</p>
-		<p style="padding:10px;">${item.s_desc}</p>
-	</div>
-	<div style="float:right;">
-		<div style="overflow:hidden;">
-			<div style="float:right;">
-				<div style="padding:0 10px;">
-					<a data-role="button" onclick="openPetList(${itemIndex},'${item.s_uid}');" style="padding:10px;">반려동물</a>
-				</div>
-			</div>
-		</div>
-		<div style="overflow:hidden;">
-			<div style="float:right;">
-			<p id="point${itemIndex}" style="padding:10px;"><fmt:formatNumber value="${item.point_sum}" pattern="#,###"/> point</p>
-			</div>
-		</div>
-	</div>
-</div>
-<div>
-	<div id="pet_list${itemIndex}" style="margin:10px; padding:10px; margin-top:-10px; padding-top:0;">
-		<hr/>
-		<div id="pet_list_inner${itemIndex}"></div>
-		<p onclick="$('#pet_list${itemIndex}').hide();">펼침 닫기</p>
-	</div>
-</div>
-<hr/> --%>
 <li>
 	<input type="hidden" id="id'${itemIndex}" value="${item.s_uid}"/>
 	<p class="txt01">${item.s_name} (<span id="phone${itemIndex}"></span>)</p>

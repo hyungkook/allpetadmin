@@ -16,4 +16,25 @@
 		WHERE S_UID = #{value}
 	</select>
 	
+	<select id="getMembers" parameterType="string" resultType="hashmap">
+		SELECT s_user_id, s_cphone_number
+		FROM DB_ALLPET.T_MEMBER
+	</select>
+	
+	<select id="getMemberByDevice" parameterType="hashmap" resultType="hashmap">
+		SELECT s_uid, s_phone_regId
+		FROM DB_ALLPET.T_MEMBER
+		WHERE S_user_id = #{userId}
+	</select>
+	
+	<update id="updateDeviceRegID" parameterType="hashmap">
+		UPDATE
+			DB_ALLPET.T_MEMBER
+		SET
+			s_phone_os = #{OS} ,
+			s_phone_regId = #{regId}
+		WHERE
+			S_user_id = #{userId}
+	</update>
+	
 </mapper>

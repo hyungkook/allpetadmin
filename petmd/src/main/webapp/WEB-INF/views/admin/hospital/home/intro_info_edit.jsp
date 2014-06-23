@@ -29,6 +29,7 @@ function saveInfo(){
 				});
 				$('#old_keyword').val($('#keyword').val());
 				$('#old_introduce').val($('#introduce').val());
+				$('#old_shortIntroduce').val($('#shortIntroduce').val());
 				$('#old_represent_staff').val($('#represent_staff').val());
 			}
 			else
@@ -45,6 +46,7 @@ function cancel(){
 	
 	if($('#old_keyword').val()!=$('#keyword').val()
 			|| $('#old_introduce').val()!=$('#introduce').val()
+			|| $('#old_shortIntroduce').val()!=$('#shortIntroduce').val()
 			|| $('#old_represent_staff').val()!=$('#represent_staff').val())
 		if(!confirm('내용 수정을 취소하시겠습니까?'))
 			return;
@@ -55,6 +57,7 @@ function cancel(){
 $(document).ready(function(){
 	
 	setInputConstraint('lengthLimit','keyword',20);
+	setInputConstraint('lengthLimit','shortIntroduce',50);
 });
 
 </script>
@@ -77,6 +80,7 @@ $(document).ready(function(){
 			<jsp:include page="../include/main_menu.jsp"/>
 			
 			<input type="hidden" id="old_keyword" value="${hospitalInfo.s_keyword}"/>
+			<input type="hidden" id="old_shortIntroduce" value="${hospitalInfo.s_shortIntroduce}"/>
 			<input type="hidden" id="old_introduce" value="${hospitalInfo.s_introduce}"/>
 			<input type="hidden" id="old_represent_staff" value="${hospitalInfo.s_represent_staff}"/>
 			
@@ -87,6 +91,12 @@ $(document).ready(function(){
 				<p class="input01 mt05"><input type="text" name="keyword" id="keyword" value="${hospitalInfo.s_keyword}"></p>
 				<p class="txt_gray11 mt05">* 20자 이하만 입력 가능합니다.</p>
 				<p class="txt_gray11">등록 예) 365일 24시간 진료, CT촬영, 재활치료, 안과, 고양이</p>
+			</div>
+			
+			<div class="a_type01_b">
+				<h3>인사말 입력</h3>
+				<p class="input01 mt05"><input type="text" name="shortIntroduce" id="shortIntroduce" value="${hospitalInfo.s_shortIntroduce}"></p>
+				<p class="txt_gray11 mt05">* 50자 이하만 입력 가능합니다.</p>
 			</div>
 			
 			<div class="a_type01_b">

@@ -32,9 +32,7 @@ boardTypeOptions+='<option value="${bt_it.s_key}">${bt_it.s_value}</option>';
 
 function addMenu(){
 	
-	var tag = '';
-	
-	+'<div class="a_type02_b" id="menu'+menuLen+'">'
+	var tag = '<div class="a_type02_b" id="menu'+menuLen+'">'
 		+'<input name="cmid" type="hidden"/>'
 		+'<input name="status" type="hidden" value="Y"/>'
 		+'<p class="input01"><input type="text" name="name" placeholder="메뉴 이름을 입력하세요."></p>'
@@ -57,7 +55,7 @@ function addMenu(){
 			+'<input type="checkbox" id="checkbox-c'+(menuLen+1)+'" value="c-'+(menuLen+1)+'" onclick="checkbox(this,"visible'+menuLen+'");" checked="checked"/>'
 			+'<label for="checkbox-c'+(menuLen+1)+'">공개 (비공개 처리 시 유저에게 노출되지 않습니다.)</label>'
 		+'</p>'
-	+'</div>'
+	+'</div>';
 	
 	$('#menuDiv').append($(tag));
 	
@@ -197,19 +195,6 @@ $(document).ready(function(){
 			
 			<div id="menuDiv">
 			<c:forEach var="item" items="${menuList}" varStatus="c">
-				<%-- <div id="menu${c.index}">${item.BOARD_TYPE}
-				<input name="value" type="text" value="${item.s_value}" style="width:100px; display:inline-block;"/>
-				<span>&nbsp;<a onclick="removeMenu('menu${c.index}')" style="color:red;">삭제</a></span>&nbsp;<a onclick="upMenu('menu${c.index}')">▲</a>&nbsp;<a onclick="downMenu('menu${c.index}')">▼</a><br/>
-				<c:if test="${item.BOARD_TYPE eq codes.CUSTOM_BOARD_TYPE_RSS}">
-				<div>
-					<input type="text" value="${item.URL}"/>
-				</div>
-				</c:if>
-				<input name="cmid" type="hidden" value="${item.s_cmid}"/>
-				<input name="parent" type="hidden" value="MENU3"/>
-				<input name="status" type="hidden" value="${item.s_status}"/>
-				<input id="menuIndex${c.index}" name="index" type="hidden" value="${item.n_index}"/>
-				</div> --%>
 				
 				<div class="a_type02_b" id="menu${c.index}">
 					<input name="cmid" type="hidden" value="${item.s_cmid}"/>
@@ -240,41 +225,6 @@ $(document).ready(function(){
 					</p>
 				</div>
 				
-				<%-- <div>
-
-					<div style="overflow:hidden;">
-						<div style="float:left;">
-							<input name="name" type="text" value="${item.s_name}" style="width:100px; display:inline-block;"/>
-						</div>
-						<div style="float:left; width:30%">
-							<select name="group" onchange="changeType('menu${c.index}',$(this).val())">
-								<c:forEach var="bt_it" items="${board_type}">
-								<option value="${bt_it.s_key}" <c:if test="${bt_it.s_key eq item.s_group}">selected="selected"</c:if>>${bt_it.s_value}</option>
-								</c:forEach>
-							</select>
-						</div>
-						<div style="float:right;"><a data-role="button" onclick="removeMenu('menu${c.index}');" style="padding:10px;">삭제</a></div>
-						<div style="float:right;"><a data-role="button" onclick="downMenu('menu${c.index}');" style="padding:10px;">▼</a></div>
-						<div style="float:right;"><a data-role="button" onclick="upMenu('menu${c.index}');" style="padding:10px;">▲</a></div>
-					</div>
-					<input name="cmid" type="hidden" value="${item.s_cmid}"/>
-					<input name="status" type="hidden" value="${item.s_status}"/>
-					<input id="content_cnt" type="hidden" value="${item.content_cnt}"/>
-					<input id="sub_cnt" type="hidden" value="${item.sub_cnt}"/>
-					<div id="rssurl">
-						<input type="text" name="rssurl" value="${item.attr_url}"/>
-					</div>
-					<div style="overflow:hidden; padding:10px;">
-						
-						<div style="float:left; height:20px;width:20px;"><input type="checkbox" id="visible_chk${c.index}" onclick="checkbox(this,'visible${c.index}');" style="margin-top:5px;" <c:if test="${item.s_visible eq 'Y'}">checked="checked"</c:if>/></div>
-						<p style="float:left">공개 (비공개 처리시 유저에게 노출되지 않습니다.)</p>
-					</div>
-					
-					<!-- <script>
-					changeType('menu${c.index}','${item.s_group}');
-					</script> -->
-					
-				</div> --%>
 			</c:forEach>
 			</div>
 			
@@ -290,15 +240,6 @@ $(document).ready(function(){
 				<p class="btn_black02 btn_l" style="width:100px;"><a onclick="cancel();" data-role="button">취소</a></p>
 				<p class="btn_red02" style="margin-left:104px;"><a onclick="saveMenu();" data-role="button">저장</a></p>
 			</div>
-			
-			<!-- <a style="color:red;">추가</a>
-			
-			<hr/>
-			
-			<div>
-				<div style="float:left; padding:10px;"><a data-role="button" style="padding:10px;">취소</a></div>
-				<div style="float:left; padding:10px;"><a data-role="button" style="padding:10px;">저장</a></div>
-			</div> -->
 			
 		</div>
 		<!-- ///// content 끝-->
