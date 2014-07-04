@@ -3,7 +3,7 @@ package kr.co.petmd.utils.gcm;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
- 
+
 import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.MulticastResult;
 import com.google.android.gcm.server.Result;
@@ -39,8 +39,6 @@ public class GCMServerSide {
 	}
 	 
 	public static void main(String[] args) throws Exception {
-		GCMServerSide s = new GCMServerSide();
-		s.sendMessage();
 	}
  
 }

@@ -306,7 +306,7 @@ $(document).ready(function(){
 	
 	m = parseInt(m / 10) * 10;
 	
-	if(ap > 0)
+	if(ap > 1)
 		selectPM();
 	else
 		selectAM();

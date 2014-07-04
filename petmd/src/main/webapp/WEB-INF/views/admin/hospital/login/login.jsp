@@ -48,7 +48,6 @@
 	<div data-role="content" id="contents">
 	
 		<div style="position:absolute; left:50%; top:-30px; z-index:-1;">
-			<img src="http://m.allpethome.co.kr/common/template/images/common/footprint01.png" width="160px"/>
 		</div>
 	
 		<div class="login_area">
@@ -84,11 +83,10 @@
 		
 		<div style="padding:20px 35px; background: white; border-top: 1px solid #e0e0e0; position:relative;">
 			<div style="position:absolute; right:60%; top:-50px; z-index:-1;">
-				<img src="http://m.allpethome.co.kr/common/template/images/common/footprint02.png" width="120px"/>
 			</div>
 			<span style="color:#ee3d25; font-weight:bold; list-style-image: url('/petmd/common/template/images/common/icon_time.png');">경고</span>
 			<ul style="padding:0 20px;">
-				<li style="list-style-type:disc; padding:10px 0;">본 사이트는 동물병원 모바일 서비스를 관리하는 사이트로써 관련자가 아닌 사람은 사용하실 수 없습니ㅏ다.</li>
+				<li style="list-style-type:disc; padding:10px 0;">본 사이트는 동물병원 모바일 서비스를 관리하는 사이트로써 관련자가 아닌 사람은 사용하실 수 없습니다.</li>
 				<li style="list-style-type:disc;">관계자가 아닌 사람이 부정 사용시 법적 제재 및 민, 형사 상의 처벌을 받을 수 있음을 알립니다.</li>
 			</ul>
 		</div>

@@ -57,7 +57,7 @@ function cancel(){
 $(document).ready(function(){
 	
 	setInputConstraint('lengthLimit','keyword',20);
-	setInputConstraint('lengthLimit','shortIntroduce',50);
+	setInputConstraint('lengthLimit','shortIntroduce',100);
 });
 
 </script>
@@ -95,8 +95,8 @@ $(document).ready(function(){
 			
 			<div class="a_type01_b">
 				<h3>인사말 입력</h3>
-				<p class="input01 mt05"><input type="text" name="shortIntroduce" id="shortIntroduce" value="${hospitalInfo.s_shortIntroduce}"></p>
-				<p class="txt_gray11 mt05">* 50자 이하만 입력 가능합니다.</p>
+				<p class="textarea01 mt05"><textarea id="shortIntroduce" name="shortIntroduce" style="width:100%; height:80px;" placeholder="인사말을 입력해주세요.">${hospitalInfo.s_shortIntroduce}</textarea></p>
+				<p class="txt_gray11 mt05">* 100자 이하만 입력 가능합니다.</p>
 			</div>
 			
 			<div class="a_type01_b">

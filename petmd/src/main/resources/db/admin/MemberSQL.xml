@@ -27,6 +27,12 @@
 		WHERE S_user_id = #{userId}
 	</select>
 	
+	<select id="getUIDByUserId" parameterType="String" resultType="String">
+		SELECT s_uid
+		FROM DB_ALLPET.T_MEMBER
+		WHERE S_user_id = #{value}
+	</select>
+	
 	<update id="updateDeviceRegID" parameterType="hashmap">
 		UPDATE
 			DB_ALLPET.T_MEMBER

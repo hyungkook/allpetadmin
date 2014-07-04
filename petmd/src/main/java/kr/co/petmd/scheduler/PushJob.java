@@ -33,14 +33,16 @@ public class PushJob implements StatefulJob{
 			}
 			int idx = (Integer)map.get("s_idx");
 			String phone_regId = (String) map.get("s_phone_regId");
-			int isPush = (Integer)map.get("s_isPush");
 			
+			String sgid = (String) map.get("s_sgid");
 			String comment = (String) map.get("s_message");
 			
-			if( !(isPush == 0 || phone_regId == null) ){
+			String pushMessage = sgid + ";" + comment;
+			
+			if( phone_regId != null ) {
 				// push 발송
 				try{
-					gcm.sendMessage(phone_regId, comment);
+					gcm.sendMessage(phone_regId, pushMessage);
 				}catch(Exception e){
 					e.printStackTrace();
 				}

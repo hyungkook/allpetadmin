@@ -7,19 +7,19 @@
     </select>
     
     <insert id="insertSchedule" parameterType="hashmap">
-		INSERT INTO DB_ALLPET.t_schedule_push(s_idx, s_uid, s_message, s_push_date)
+		INSERT INTO DB_ALLPET.t_schedule_push(s_idx, s_uid, s_sgid, s_message, s_push_date)
 		VALUES
-		(#{s_idx}, #{s_uid}, #{s_message}, #{s_push_date})
+		(#{s_idx}, #{s_uid}, #{s_sgid}, #{s_message}, #{s_push_date})
 	</insert>
 	
     <select id="getAllSchedule" resultType="hashmap" parameterType="hashmap">
     	SELECT 
     		p.s_idx ,
 			p.s_uid ,
+			p.s_sgid ,
 			p.s_message ,
 			p.s_push_date ,
-			m.s_phone_regId,
-			m.s_isPush
+			m.s_phone_regId
     	FROM DB_ALLPET.t_schedule_push p
     			JOIN DB_ALLPET.t_member m ON p.s_uid = m.s_uid
     </select>

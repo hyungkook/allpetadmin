@@ -123,6 +123,7 @@ public class ManageScheduleAction extends AbstractAction{
 				Map<String, Object> scheduleMap = new HashMap<String, Object>();
 				scheduleMap.put("s_idx", maxIdx + 1);
 				scheduleMap.put("s_uid", ids[i]);
+				scheduleMap.put("s_sgid", sgid);
 				scheduleMap.put("s_message", comment);
 				scheduleMap.put("s_push_date", c.getTime() );
 				SqlDao.insert("Admin.Push.Schedule.insertSchedule", scheduleMap);
@@ -271,6 +272,68 @@ public class ManageScheduleAction extends AbstractAction{
 		else
 			return builder.add("result", Codes.ERROR_QUERY_EXCEPTION).build();
 	}
+	
+	/**
+	 * 앱에서 전자차트상에 문자가 왔을경우 호출되는 메서드.
+	 * 일정 및 푸쉬에 저장이 되고 날짜는 
+	 * @param model
+	 * @param request
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(value="/createScheduleByEChart.latte")
+	public @ResponseBody String createScheduleByEChart(Model model, HttpServletRequest request, @RequestParam HashMap<String, String> params)
+		throws Exception{
+		
+		SessionContext sessionContext = (SessionContext) sessionContextFactory.getObject();
+		
+		String userId = params.get("userId");
+		String comment = params.get("comment");
+		String uid = SqlDao.getString("Admin.Member.getUIDByUserId", userId);
+		String scheduleDate = params.get("scheduleDate");		// 2014-07-01
+		
+		if( userId != null && uid != null && scheduleDate != null){
+			
+			String sgid = Common.makeRownumber("sgid", System.currentTimeMillis()*123+"");
+			SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+			Date date = f.parse(scheduleDate);
+			Calendar c = Calendar.getInstance ( );
+			c.setTime(date);
+			c.add(Calendar.HOUR_OF_DAY, 16);		// 예약이 오면 오후 4시로 셋팅함
+			
+			// push 입력 시작
+			int maxIdx = SqlDao.getInt("Admin.Push.Schedule.getMaxIdx", new HashMap());
+			if( maxIdx < 1){
+				maxIdx = 0;
+			}
+			
+			Map<String, Object> scheduleMap = new HashMap<String, Object>();
+			scheduleMap.put("s_idx", maxIdx + 1);
+			scheduleMap.put("s_uid", uid);
+			scheduleMap.put("s_sgid", sgid);
+			scheduleMap.put("s_message", comment);
+			scheduleMap.put("s_push_date", c.getTime() );
+			SqlDao.insert("Admin.Push.Schedule.insertSchedule", scheduleMap);
+			// push 입력 끝 
+				
+			
+			// 스케줄 등록
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+			String todoDate = df.format(c.getTime());
+			params.put("sgid", sgid);
+			params.put("registrant", sessionContext.getUserMap().get("s_sid"));
+			params.put("type", Codes.REGISTRANT_TYPE_HOSPITAL);
+			params.put("todo_date", todoDate);
+			
+			int result = SqlDao.insert("Admin.Hospital.Schedule.v2.insertSchedule", params);
+			
+		}
+		
+		return null;
+		
+	}
+	
+	
 	
 	// 스케줄 리스트에서 날짜 변경시 호출
 		@RequestMapping(value="/ajaxMyPageSchedule.latte")
