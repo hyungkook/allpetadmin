@@ -49,10 +49,17 @@ function saveInfo(){
 		return;
 	}
 	
+	var s_hospital_name_use;
+	if($('input:checkbox[name=s_hospital_name_use]').is(':checked')){
+		s_hospital_name_use = "1";
+	}else{
+		s_hospital_name_use = "0";
+	}
+	
 	$.ajax({
 		url:'ajaxSaveManageMainInfo.latte',
 		type:'POST',
-		data:$('#form').serialize()+"&logo_id="+$('#logo_id').val()+"&header_id="+$('#header_id').val(),
+		data:$('#form').serialize()+"&logo_id="+$('#logo_id').val()+"&header_id="+$('#header_id').val()+"&s_hospital_name_use="+s_hospital_name_use,
 		dataType:'json',
 		success:function(response, status, xhr){
 						
@@ -209,7 +216,22 @@ $(document).ready(function(){
 				<jsp:param value="1" name="cur_manage_menu"/>
 			</jsp:include>
 			<!-- // tab 끝-->
-			
+			<div class="a_type02_b">
+				<h3><img src="${con.IMGPATH}/common/bu_tt.png" alt="" width="16" height="14" />병원 이름</h3>
+				<div id="main_menu" class="dl_type01 mt05">
+					<dl class="mt10">
+						<dt>병원 이름</dt>
+						<dd style="margin:0 80px 0 80px;"><p class="input01"><input type="text" name="name" value="${hospitalInfo.s_hospital_name}" disabled="disabled"></p></dd>
+						<dd style="margin:5px 0 0 80px;"></dd>
+						<dd class="abs_rt" style="width:75px; top:6px;">
+							<p class="checkbox">
+								<input type="checkbox" id="checkbox-cw" name="s_hospital_name_use" value="1" <c:if test="${hospitalInfo.s_hospital_name_use eq 1 }">checked="checked"</c:if>/>
+								<label for="checkbox-cw">사용함</label>
+							</p>
+						</dd>
+					</dl>
+				</div>
+			</div>
 			<div class="a_type02_b">
 				<h3><img src="${con.IMGPATH}/common/bu_tt.png" alt="" width="16" height="14" />병원 로고</h3>
 				<input type="hidden" id="logo_id" value="${logo_img.s_iid}"/>

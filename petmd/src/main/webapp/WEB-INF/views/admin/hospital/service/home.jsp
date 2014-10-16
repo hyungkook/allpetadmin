@@ -192,35 +192,6 @@ $(window).load(function(){
 			</div>
 			
 			
-			<%-- <div style="padding:5px 10px 0px 10px;">
-				<a data-role="button" onclick="goPage('serviceMenuEdit.latte')" style="padding:10px;">메뉴 편집</a>
-			</div>
-			
-			<c:if test="${not empty subMenuList}">
-
-			<div style="padding:10px;">
-				<select onchange="goPage('serviceHome.latte?idx=${params.idx}&cmid=${boardInfo.s_cmid}&cmid='+$(this).val());">
-					<c:forEach var="item" items="${subMenuList}" varStatus="c">
-						<option value="${item.s_cmid}" <c:if test="${subBoardInfo.s_cmid eq item.s_cmid}">selected="selected"</c:if>>${item.s_name}</option>
-					</c:forEach>
-				</select>
-			</div>
-			</c:if>
-			<!-- // tab 끝-->
-			
-			<div style="padding:0px 10px;">
-				<a data-role="button" onclick="goPage('serviceMenuEdit.latte?cmid=${boardInfo.s_cmid}')" style="padding:10px;">분류 편집</a>
-			</div> --%>
-			
-			
-			<%-- <c:if test="${not empty subMenuList}"> --%>
-				<%-- <hr/>
-				
-				<div style="padding:0px 10px;">
-					<a data-role="button" onclick="goPage('serviceContentEdit.latte?g=<c:choose><c:when test="${empty subMenuList}">${boardInfo.s_cmid}</c:when><c:otherwise>${subBoardInfo.s_cmid}</c:otherwise></c:choose>')" style="padding:10px;">항목 추가</a>
-				</div> --%>
-			<%-- </c:if> --%>
-			
 			<c:if test="${not empty boardList}">
 			<c:forEach var="item" items="${boardList}" varStatus="c">
 			

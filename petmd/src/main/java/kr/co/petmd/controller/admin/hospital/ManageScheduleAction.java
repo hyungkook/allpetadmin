@@ -147,7 +147,6 @@ public class ManageScheduleAction extends AbstractAction{
 		int result = SqlDao.insert("Admin.Hospital.Schedule.v2.insertSchedule", params);
 		
 		// 스케줄 해당 유저/동물 입력
-		
 		BatchQueryBuilder detailQuery = new BatchQueryBuilder();
 		
 		int user_cnt = Common.lengthOf(ids);
@@ -292,6 +291,12 @@ public class ManageScheduleAction extends AbstractAction{
 		String uid = SqlDao.getString("Admin.Member.getUIDByUserId", userId);
 		String scheduleDate = params.get("scheduleDate");		// 2014-07-01
 		
+		
+		logger.info(" userId = " + userId );
+		logger.info(" comment = " + comment );
+		logger.info(" uid = " + uid );
+		logger.info(" scheduleDate = " + scheduleDate );
+		
 		if( userId != null && uid != null && scheduleDate != null){
 			
 			String sgid = Common.makeRownumber("sgid", System.currentTimeMillis()*123+"");
@@ -317,15 +322,41 @@ public class ManageScheduleAction extends AbstractAction{
 			// push 입력 끝 
 				
 			
+			String domain = request.getRequestURL().toString();
+			
+			domain = domain.replace("http://", "");
+			domain = domain.substring(0, domain.indexOf("/"));
+			
+			//System.out.println(domain);
+			//model.addAttribute("domain", domain);
+			
+			// 병원 정보 가져오기
+			Map<String,String> hospitalInfo = SqlDao.getMap("Admin.Push.Schedule.getSidbyDomain", domain);
+			
 			// 스케줄 등록
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 			String todoDate = df.format(c.getTime());
 			params.put("sgid", sgid);
-			params.put("registrant", sessionContext.getUserMap().get("s_sid"));
+			params.put("registrant", hospitalInfo.get("s_sid"));
 			params.put("type", Codes.REGISTRANT_TYPE_HOSPITAL);
 			params.put("todo_date", todoDate);
 			
 			int result = SqlDao.insert("Admin.Hospital.Schedule.v2.insertSchedule", params);
+			
+			// 스케줄 해당 유저/동물 입력
+			BatchQueryBuilder detailQuery = new BatchQueryBuilder();
+			
+			detailQuery.open();
+			detailQuery.appendString(Common.makeRownumber("sd_row", System.currentTimeMillis()*1234+""));
+			detailQuery.appendString(sgid);
+			detailQuery.appendString(uid);
+			detailQuery.appendString("");
+			detailQuery.appendString("Y");
+			detailQuery.appendRaw("NULL");
+			detailQuery.close();
+
+			String sss = detailQuery.build();
+			int result2 = SqlDao.insert("Admin.Hospital.Schedule.v2.insertDetails", sss);//detailQuery.build());
 			
 		}
 		

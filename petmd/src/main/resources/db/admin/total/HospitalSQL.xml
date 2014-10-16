@@ -281,4 +281,10 @@
 			S_MANAGE_TEL = #{manage_tel}
 	</insert>
 	
+	<select id="getUserCountList" resultType="hashmap">
+		SELECT
+			S_SID , S_HOSPITAL_NAME, S_TODAY_COUNT, S_TOTAL_COUNT
+		FROM
+			DB_ALLPET.t_user_count
+	</select>	
 </mapper>

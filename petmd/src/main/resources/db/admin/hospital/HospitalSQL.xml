@@ -74,7 +74,8 @@
 			DB_ALLPET.T_HOSPITAL_MORE_INFO
 		SET
 			S_FAX = #{fax},
-			S_EMAIL = #{email}
+			S_EMAIL = #{email},
+			s_hospital_name_use = #{s_hospital_name_use}
 		WHERE
 			S_SID = #{sid}
 	</update>

@@ -28,6 +28,7 @@
 			MI.s_email,
 			MI.s_fax,
 			MI.s_represent_staff,
+			MI.s_hospital_name_use,
 			(
 				SELECT
 					s_name

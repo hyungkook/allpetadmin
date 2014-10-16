@@ -507,5 +507,13 @@ public class TotalHospitalAction extends BaseAction{
 		return totalViewName;
 	}
 	
-	//@
+
+	@RequestMapping(value = {"/total/list.latte"})
+	public String list(Model model, HttpServletRequest request, HttpSession session, @RequestParam Map<String, String> params) {
+		
+		List<Map> list =SqlDao.getList("Admin.Total.Hospital.getUserCountList", params);
+		model.addAttribute("hospitalList", list);
+		
+		return "admin/total/hospital/hospitalList";
+	}
 }

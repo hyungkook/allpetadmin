@@ -94,8 +94,7 @@ function switching(tagId,id,type){
 	}
 }
 
-function remove(id){
-	
+function removeItem(id){
 	if(!confirm('작성된 내용을 삭제하시겠습니까?'))
 		return;
 	
@@ -168,7 +167,7 @@ function remove(id){
 							</a>
 							<p class="btn_t btn_admin01"><a onclick="switching($(this).parent().parent().attr('id'),'${item.s_stid}','previous')" data-role="button"><img src="${con.IMGPATH}/btn/btn_t.png" alt="" width="31" height="31" /></a></p>
 							<p class="btn_b btn_admin01"><a onclick="switching($(this).parent().parent().attr('id'),'${item.s_stid}','next')" data-role="button"><img src="${con.IMGPATH}/btn/btn_b.png" alt="" width="31" height="31" /></a></p>
-							<p class="btn_d btn_admin01"><a onclick="remove('${item.s_stid}');" data-role="button"><img src="${con.IMGPATH}/btn/btn_d.png" alt="" width="31" height="31" /></a></p>
+							<p class="btn_d btn_admin01"><a onclick="removeItem('${item.s_stid}');" data-role="button"><img src="${con.IMGPATH}/btn/btn_d.png" alt="" width="31" height="31" /></a></p>
 						</li>
 						</c:forEach>
 						<c:if test="${empty staffList}">

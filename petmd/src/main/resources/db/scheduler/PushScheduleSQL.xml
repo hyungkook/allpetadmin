@@ -31,4 +31,12 @@
 		</if>
 	</delete>
 	
+    <select id="getSidbyDomain" parameterType="string" resultType="hashmap">
+		SELECT 
+			S_SID s_sid,
+			s_hospital_id
+		FROM DB_ALLPET.T_HOSPITAL_BASIC_INFO
+		WHERE S_STATUS = '10001'
+			AND S_DOMAIN = #{value}
+	</select>
 </mapper>
