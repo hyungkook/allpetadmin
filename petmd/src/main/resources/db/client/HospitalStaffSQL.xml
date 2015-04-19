@@ -69,9 +69,7 @@
 		WHERE
 			S_CATEGORY = #{category}
 			AND S_SID = #{idx}
-			<if test="state != null and !state.equals('')">
 			AND S_STATE = 'Y'
-			</if>
 	</select>
 	
 	<select id="getStaffList" parameterType="hashmap" resultType="hashmap">
@@ -101,9 +99,7 @@
 			S_CATEGORY = #{category} AND
 			</if>
 			S_SID = #{idx}
-			<if test="state != null and !state.equals('')">
 			AND S_STATE = 'Y'
-			</if>
 		ORDER BY N_INDEX ASC
 		<if test="startRow != null and !startRow.equals('')">
 		LIMIT ${startRow}, ${endRow}

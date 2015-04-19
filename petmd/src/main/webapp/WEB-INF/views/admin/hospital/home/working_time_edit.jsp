@@ -71,18 +71,12 @@ function addItem(){
 							{tagName:"input",type:"hidden",id:"alltime"+index,name:"alltime",value:"N"},
 							{tagName:"input",type:"hidden",id:"dayoff"+index,name:"dayoff",value:"N"},
 							{
-								tagName:"div",cls:"btn_select02",style:"float:left; width:44%;",children:
-								[
+								tagName:"div",cls:"btn_select02",style:"float:left; width:44%;",child:
 								{
-									tagName:"a",dataRole:"button",child:
-										{tagName:"select",name:"name",dataIcon:"false",children:weeks_options}
-								},
-								{
-									tagName:"p",cls:"bu",child:
-										{tagName:"img",src:"${con.IMGPATH}/common/select_arrow.png",alt:"",width:"26",height:"34"}
+									tagName:"p",cls:"input01",child:
+										{tagName:"input",type:"text",name:"comment"}
 								}
-								]
-							},
+ 							},
 							{
 								tagName:"p",cls:"checkbox",style:"float:left; width:28%; margin:10px 0 0 5px;",children:
 									[
@@ -148,38 +142,6 @@ function addItem(){
 					]
 			}
 	);
-	
-	/* var $tag = $('<div id="item'+index+'">'
-	+'<input type="hidden" id="alltime'+index+'" name="alltime" value="N"/>'
-	+'<input type="hidden" id="dayoff'+index+'" name="dayoff" value="N"/>'
-	+'<div style="overflow:hidden; padding:10px;">'
-		+'<div style="float:left; width:100px;">'
-			+'<select name="name">'+weeks_options+'</select>'
-		+'</div>'
-		+'<div style="float:left; height:1px; width:20px;">'
-			+'<input type="checkbox" <c:if test="${item.s_alltime eq \'Y\'}">checked="checked"</c:if> onclick="check(\'alltime'+index+'\',this)"/>'
-		+'</div>'
-		+'<div style="float:left;">24시간</div>'
-		+'<div style="float:left; height:1px; width:20px;">'
-			+'<input type="checkbox" <c:if test="${item.s_dayoff eq \'Y\'}">checked="checked"</c:if> onclick="check(\'dayoff'+index+'\',this)"/>'
-		+'</div>'
-		+'<div style="float:left;">휴무</div>'
-	+'</div>'
-	+'<div style="overflow:hidden; padding:10px;">'
-		+'<div style="float:left; width:100px;">'
-			+'<select name="start_time">'+times_options+'</select>'
-		+'</div>'
-		+'<div style="float:left; width:100px;">'
-			+'<select name="end_time">'+times_options+'</select>'
-		+'</div>'
-		+'<div style="float:left; width:50%;">'
-			+'<input type="text" name="comment" placeholder="링크될 URL 정보를 입력해 주세요." style="border:1px solid gray; color:gray;"/>'
-		+'</div>'
-		+'<div style="float:right;">'
-			+'<a data-role="button" onclick="removeItem(\'item'+index+'\')" style="padding:10px;">X</a>'
-		+'</div>'
-	+'</div>'
-	+'</div>'); */
 	
 	$('#time_list').append($tag);
 	$('#time_list').trigger('create');
@@ -368,7 +330,10 @@ function ps(p){
 				<div class="area00" style="margin:0 35px 0 0;">
 					<input type="hidden" id="alltime${c.index}" name="alltime" value="<c:if test='${empty item.s_alltime}'>N</c:if><c:if test='${not empty item.s_alltime}'>${item.s_alltime}</c:if>"/>
 					<input type="hidden" id="dayoff${c.index}" name="dayoff" value="<c:if test='${empty item.s_dayoff}'>N</c:if><c:if test='${not empty item.s_dayoff}'>${item.s_dayoff}</c:if>"/>
-					<div class="btn_select02" style=" float:left; width:44%;">
+					<div class="area00" style="float:left; width:44%;">
+						<p class="input01"><input type="text" name="name" placeholder="운영시간을 입력하세요." value="${item.s_name}"></p>
+					</div>
+					<%-- <div class="btn_select02" style=" float:left; width:44%;">
 						<a data-role="button" >
 						<select name="name" data-icon="false">
 							<c:forEach var="witem" items="${weeks}">
@@ -377,7 +342,7 @@ function ps(p){
 						</select>
 						</a>
 						<p class="bu"><img src="${con.IMGPATH}/common/select_arrow.png" alt="" width="26" height="34"/></p>
-					</div>
+					</div> --%>
 					<p class="checkbox" style="float:left; width:28%; margin:10px 0 0 5px;">
 						<input type="checkbox" id="checkbox-c${check_num1}" value="c-${check_num1}"<c:if test="${item.s_alltime eq 'Y'}"> checked="checked"</c:if> onclick="check('alltime${c.index}',this)"/>
 						<label for="checkbox-c${check_num1}">24시간</label>

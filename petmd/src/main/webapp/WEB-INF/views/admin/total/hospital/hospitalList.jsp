@@ -8,6 +8,10 @@
 <html lang="ko">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<jsp:include page="/WEB-INF/views/admin/hospital/include/total_header.jsp"/>
+
+<script type="text/javascript" src="${con.JSPATH}/jquery.event.drag-1.5.min.js"></script>
+<script type="text/javascript" src="http://dohoons.com/test/flick/jquery.touchSlider.js"></script>
 </head>
 <body>
 	<table border="1">

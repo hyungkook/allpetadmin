@@ -408,14 +408,14 @@ public class TotalHospitalAction extends BaseAction{
 			
 			param.put("parent", "MAIN_MENU");
 			
-			param.put("name", "메인메뉴");
+			param.put("name", "병원소개");
 			param.put("cmid", Common.makeRownumber("cmid", System.currentTimeMillis()+""));
 			param.put("group", Codes.CUSTOM_CATEGORY_MAIN_MENU_1);
 			param.put("index", "1");
 			
 			SqlDao.insert("COMMON.insertCustomizeItem", param);
 			
-			param.put("name", "스태프");
+			param.put("name", "의료진/스텝");
 			param.put("cmid", Common.makeRownumber("cmid", System.currentTimeMillis()+""));
 			param.put("group", Codes.CUSTOM_CATEGORY_MAIN_MENU_2);
 			param.put("index", "2");
@@ -423,7 +423,7 @@ public class TotalHospitalAction extends BaseAction{
 			SqlDao.insert("COMMON.insertCustomizeItem", param);
 			
 			String cmid3 = Common.makeRownumber("cmid", System.currentTimeMillis()+"");
-			param.put("name", "서비스");
+			param.put("name", "진료/서비스");
 			param.put("cmid", cmid3);
 			param.put("group", Codes.CUSTOM_CATEGORY_MAIN_MENU_3);
 			param.put("index", "3");
@@ -431,7 +431,7 @@ public class TotalHospitalAction extends BaseAction{
 			SqlDao.insert("COMMON.insertCustomizeItem", param);
 			
 			String cmid4 = Common.makeRownumber("cmid", System.currentTimeMillis()+"");
-			param.put("name", "소식");
+			param.put("name", "병원소식");
 			param.put("cmid", cmid4);
 			param.put("group", Codes.CUSTOM_CATEGORY_MAIN_MENU_4);
 			param.put("index", "4");
