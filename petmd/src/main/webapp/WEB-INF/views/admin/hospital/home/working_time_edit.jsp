@@ -74,7 +74,7 @@ function addItem(){
 								tagName:"div",cls:"btn_select02",style:"float:left; width:44%;",child:
 								{
 									tagName:"p",cls:"input01",child:
-										{tagName:"input",type:"text",name:"comment"}
+										{tagName:"input",type:"text",name:"name"}
 								}
  							},
 							{

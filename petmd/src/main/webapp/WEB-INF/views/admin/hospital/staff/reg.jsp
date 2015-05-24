@@ -189,8 +189,10 @@ function addCareerItem(){
 				+'<p class="bu"><img src="${con.IMGPATH}/common/select_arrow.png" alt="" width="26" height="34"/></p>'
 			+'</div>'
 		+'</div>'
-		+'<div class="area00" style="padding:5px 35px 0 0;">'
+		+'<div class="area00" style="padding:5px 110px 0 0;">'
 			+'<p class="input01"><input type="text" name="desc" value=""></p>'
+			+'<p class="btn_admin01 abs_r03"><a onclick="switchItem(\'c_item'+values.careerId+'\',\'previous\')" data-role="button"><img src="${con.IMGPATH}/btn/btn_t.png" alt="" width="31" height="31" /></a></p>'
+			+'<p class="btn_admin01 abs_r02"><a onclick="switchItem(\'c_item'+values.careerId+'\',\'next\')" data-role="button"><img src="${con.IMGPATH}/btn/btn_b.png" alt="" width="31" height="31" /></a></p>'
 			+'<p class="btn_admin01 abs_r01"><a onclick="removeItem(\'c_item'+values.careerId+'\')" data-role="button"><img src="${con.IMGPATH}/btn/btn_d.png" alt="" width="31" height="31" /></a></p>'
 		+'</div>'
 	+'</div>');
@@ -209,8 +211,10 @@ function addBooksItem(){
 		+'<input type="hidden" name="type" value="${codes.STAFF_PAST_BOOKS}"/>'
 		+'<input type="hidden" name="start_date"/>'
 		+'<input type="hidden" name="end_date"/>'
-		+'<div class="area00" style="padding:5px 35px 0 0;">'
+		+'<div class="area00" style="padding:5px 110px 0 0;">'
 			+'<p class="input01"><input type="text" name="desc" value=""></p>'
+			+'<p class="btn_admin01 abs_r03"><a onclick="switchItem(\'b_item'+values.booksId+'\',\'previous\')" data-role="button"><img src="${con.IMGPATH}/btn/btn_t.png" alt="" width="31" height="31" /></a></p>'
+			+'<p class="btn_admin01 abs_r02"><a onclick="switchItem(\'b_item'+values.booksId+'\',\'next\')" data-role="button"><img src="${con.IMGPATH}/btn/btn_b.png" alt="" width="31" height="31" /></a></p>'
 			+'<p class="btn_admin01 abs_r01"><a onclick="removeItem(\'b_item'+values.booksId+'\')" data-role="button"><img src="${con.IMGPATH}/btn/btn_d.png" alt="" width="31" height="31" /></a></p>'
 		+'</div>'
 	+'</div>');
@@ -222,7 +226,17 @@ function addBooksItem(){
 	$('[selector-name="books_item"]:last').after($tag);
 	$('#books_list').trigger('create');
 }
-
+function switchItem(id, type){
+	if( type == 'previous' ){
+		if( $('#'+id).prev().hasClass('items') ){
+			$('#'+id).insertBefore($('#'+id).prev());
+		}
+	}else if( type == 'next'){
+		if( $('#'+id).next().hasClass('items') ){
+			$('#'+id).insertAfter($('#'+id).next());
+		}
+	}
+}
 function removeItem(id){
 	
 	$('#'+id).remove();
@@ -506,7 +520,7 @@ function remove(){
 					</p>
 				</h3>
 				<c:forEach var="item" items="${staffCareer}" varStatus="c">
-				<div id="c_item${c.index}" selector-name="career_item">
+				<div id="c_item${c.index}" selector-name="career_item" class="items">
 					<input type="hidden" name="type" value="${item.s_type}"/>
 					<input type="hidden" name="end_date" value="${item.d_end_date}"/>
 					<div class="area00" style="margin:10px 35px 0 0;">
@@ -521,8 +535,10 @@ function remove(){
 							<p class="bu"><img src="${con.IMGPATH}/common/select_arrow.png" alt="" width="26" height="34"/></p>
 						</div>
 					</div>
-					<div class="area00" style="padding:5px 35px 0 0;">
+					<div class="area00" style="padding:5px 110px 0 0;">
 						<p class="input01"><input type="text" name="desc" value="${item.s_desc}"></p>
+						<p class="btn_admin01 abs_r03"><a onclick="switchItem('c_item${c.index}','previous')" data-role="button"><img src="${con.IMGPATH}/btn/btn_t.png" alt="" width="31" height="31" /></a></p>
+						<p class="btn_admin01 abs_r02"><a onclick="switchItem('c_item${c.index}','next')" data-role="button"><img src="${con.IMGPATH}/btn/btn_b.png" alt="" width="31" height="31" /></a></p>
 						<p class="btn_admin01 abs_r01"><a onclick="removeItem('c_item${c.index}')" data-role="button"><img src="${con.IMGPATH}/btn/btn_d.png" alt="" width="31" height="31" /></a></p>
 					</div>
 				</div>
@@ -542,12 +558,14 @@ function remove(){
 					</p>
 				</h3>
 				<c:forEach var="item" items="${staffBooks}" varStatus="c">
-				<div id="b_item${c.index}" selector-name="books_item">
+				<div id="b_item${c.index}" selector-name="books_item" class="items">
 					<input type="hidden" name="type" value="${item.s_type}"/>
 					<input type="hidden" name="start_date" value="${item.d_start_date}"/>
 					<input type="hidden" name="end_date" value="${item.d_end_date}"/>
-					<div class="area00" style="padding:5px 35px 0 0;">
+					<div class="area00" style="padding:5px 110px 0 0;">
 						<p class="input01"><input type="text" name="desc" value="${item.s_desc}"></p>
+						<p class="btn_admin01 abs_r03"><a onclick="switchItem('b_item${c.index}','previous')" data-role="button"><img src="${con.IMGPATH}/btn/btn_t.png" alt="" width="31" height="31" /></a></p>
+						<p class="btn_admin01 abs_r02"><a onclick="switchItem('b_item${c.index}','next')" data-role="button"><img src="${con.IMGPATH}/btn/btn_b.png" alt="" width="31" height="31" /></a></p>
 						<p class="btn_admin01 abs_r01"><a onclick="removeItem('b_item${c.index}')" data-role="button"><img src="${con.IMGPATH}/btn/btn_d.png" alt="" width="31" height="31" /></a></p>
 					</div>
 				</div>

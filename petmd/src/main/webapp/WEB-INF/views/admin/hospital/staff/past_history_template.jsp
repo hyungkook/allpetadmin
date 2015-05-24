@@ -49,7 +49,7 @@
 			<a data-role="button" onclick="removeItem('h_item${id}')" style="padding:10px;">X</a>
 		</div>
 	</div> --%>
-<div id="h_item${id}" selector-name="history_item">
+<div id="h_item${id}" selector-name="history_item" class="items">
 	<input type="hidden" name="type" value="${type}"/>
 	<div class="area00" style="margin:10px 35px 0 0;">
 		<div class="btn_select02" style=" float:left; width:30%;">
@@ -74,8 +74,10 @@
 			<p class="bu"><img src="${con.IMGPATH}/common/select_arrow.png" alt="" width="26" height="34"/></p>
 		</div>
 	</div>
-	<div class="area00" style="padding:5px 35px 0 0;">
+	<div class="area00" style="padding:5px 110px 0 0;">
 		<p class="input01"><input type="text" name="desc" value="${item.s_desc}"></p>
+		<p class="btn_admin01 abs_r03"><a onclick="switchItem('h_item${id}','previous')" data-role="button"><img src="${con.IMGPATH}/btn/btn_t.png" alt="" width="31" height="31" /></a></p>
+		<p class="btn_admin01 abs_r02"><a onclick="switchItem('h_item${id}','next')" data-role="button"><img src="${con.IMGPATH}/btn/btn_b.png" alt="" width="31" height="31" /></a></p>
 		<p class="btn_admin01 abs_r01"><a onclick="removeItem('h_item${id}')" data-role="button"><img src="${con.IMGPATH}/btn/btn_d.png" alt="" width="31" height="31" /></a></p>
 	</div>
 </div>
